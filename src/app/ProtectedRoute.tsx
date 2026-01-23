@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
+import axios from "axios";
 
 type Props = {
   children: React.ReactNode;
@@ -10,11 +11,10 @@ export default function ProtectedRoute({ children }: Props) {
   const [authenticated, setAuthenticated] = useState(false);
 
   useEffect(() => {
-    fetch("http://localhost:3000/users/me", {
-      credentials: "include",
-    })
-      .then((res) => {
-        if (res.ok) {
+    axios
+      .get("http://localhost:3000/users/me", { withCredentials: true })
+      .then((response) => {
+        if (response.status === 200) {
           setAuthenticated(true);
         } else {
           setAuthenticated(false);
