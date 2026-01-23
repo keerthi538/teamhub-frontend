@@ -73,7 +73,7 @@ export default function Login() {
 
         {/* Footer */}
         <div className="mt-6 text-center text-sm text-[#5b6b8a]">
-          Don’t have an account?{" "}
+          Don't have an account?{" "}
           <span className="cursor-pointer font-medium text-[#4f7cff] hover:underline">
             Sign up
           </span>
