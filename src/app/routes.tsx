@@ -1,5 +1,5 @@
-import Login from "../pages/Login";
-import Dashboard from "../pages/Dashboard";
+import Login from "./pages/Login";
+import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./ProtectedRoute";
 
 export const routes = [

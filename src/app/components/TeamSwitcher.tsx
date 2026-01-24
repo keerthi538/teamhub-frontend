@@ -1,9 +1,5 @@
 import { useState } from "react";
-
-type Team = {
-  id: string;
-  name: string;
-};
+import type { Team } from "../types";
 
 export function TeamSwitcher({
   teams,

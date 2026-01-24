@@ -1,18 +1,13 @@
+import type { Team } from "../types";
 import { TeamSwitcher } from "./TeamSwitcher";
 
 interface NavbarProps {
-  currentTeam: string | null;
+  currentTeam: Team | null;
   userName: string;
+  teams: Array<{ id: number; name: string }>;
 }
 
-const mockUser = {
-  name: "Tsu Zuko",
-  avatarInitials: "TZ",
-};
-
-const mockTeams = [{ id: "team_1", name: "TeamHub Core" }];
-
-const Navbar = ({ currentTeam, userName }: NavbarProps) => {
+const Navbar = ({ userName, teams, currentTeam }: NavbarProps) => {
   return (
     <header className="sticky top-0 z-10 border-b border-[#e6ebf5] bg-white/80 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
@@ -21,8 +16,8 @@ const Navbar = ({ currentTeam, userName }: NavbarProps) => {
           <span className="text-lg font-semibold text-[#0b1220]">TeamHub</span>
 
           <TeamSwitcher
-            teams={mockTeams}
-            currentTeam={{ id: "1", name: currentTeam ?? "" }}
+            teams={teams}
+            currentTeam={currentTeam}
             onSelect={(team) => console.log("Team selected: ", team)}
           />
         </div>

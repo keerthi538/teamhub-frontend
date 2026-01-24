@@ -1,16 +1,22 @@
-import { useState } from "react";
 import Navbar from "../components/Navbar";
+import { useAppSelector } from "../store/hooks";
 
 export default function Dashboard() {
-  const [currentTeam, setCurrentTeam] = useState("Tigers");
+  // const [currentTeam, setCurrentTeam] = useState("Tigers");
+  const user = useAppSelector((state) => state.user);
+  const { currentTeam, name: userName, teams } = user;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#f6f8ff] to-white">
-      <Navbar currentTeam={currentTeam} userName="Zuko" />
+      <Navbar
+        currentTeam={currentTeam ?? null}
+        userName={userName}
+        teams={teams ?? []}
+      />
 
       {/* Main content */}
       <main className="mx-auto max-w-7xl px-6 py-10">
-        {currentTeam ? (
+        {user.currentTeam ? (
           <>
             {/* Quick actions */}
             <section className="mb-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -21,10 +27,6 @@ export default function Dashboard() {
               <ActionCard
                 title="Browse documents"
                 description="View and manage your team files"
-              />
-              <ActionCard
-                title="Invite teammates"
-                description="Collaborate with your team"
               />
             </section>
 
