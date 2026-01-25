@@ -1,5 +1,8 @@
+import axios from "axios";
 import type { Team } from "../types";
+import { CreateTeamModal } from "./CreateTeamModal";
 import { TeamSwitcher } from "./TeamSwitcher";
+import { useState } from "react";
 
 interface NavbarProps {
   currentTeam: Team | null;
@@ -8,6 +11,26 @@ interface NavbarProps {
 }
 
 const Navbar = ({ userName, teams, currentTeam }: NavbarProps) => {
+  const [isCreateTeamOpen, setIsCreateTeamOpen] = useState(false);
+
+  const createTeam = (teamName: string) => {
+    setIsCreateTeamOpen(false);
+    axios
+      .post(
+        "http://localhost:3000/teams/create",
+        {
+          teamName,
+        },
+        { withCredentials: true },
+      )
+      .then((resp) => {
+        console.log(resp.data);
+      })
+      .catch((err) => {
+        console.error("Error creating team:", err);
+      });
+  };
+
   return (
     <header className="sticky top-0 z-10 border-b border-[#e6ebf5] bg-white/80 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
@@ -19,6 +42,7 @@ const Navbar = ({ userName, teams, currentTeam }: NavbarProps) => {
             teams={teams}
             currentTeam={currentTeam}
             onSelect={(team) => console.log("Team selected: ", team)}
+            setIsCreateTeamOpen={setIsCreateTeamOpen}
           />
         </div>
 
@@ -43,6 +67,11 @@ const Navbar = ({ userName, teams, currentTeam }: NavbarProps) => {
           </button>
         </div>
       </div>
+      <CreateTeamModal
+        open={isCreateTeamOpen}
+        onClose={() => setIsCreateTeamOpen(false)}
+        onCreate={createTeam}
+      />
     </header>
   );
 };

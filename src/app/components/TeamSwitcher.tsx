@@ -5,10 +5,12 @@ export function TeamSwitcher({
   teams,
   currentTeam,
   onSelect,
+  setIsCreateTeamOpen,
 }: {
   teams: Team[];
   currentTeam: Team | null;
   onSelect: (team: Team) => void;
+  setIsCreateTeamOpen: (open: boolean) => void;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -46,7 +48,13 @@ export function TeamSwitcher({
           </div>
 
           <div className="border-t border-[#e6ebf5]">
-            <button className="w-full px-4 py-2 text-left text-sm text-[#4f7cff] hover:bg-[#f6f8ff]">
+            <button
+              className="w-full px-4 py-2 text-left text-sm text-[#4f7cff] hover:bg-[#f6f8ff]"
+              onClick={() => {
+                setIsCreateTeamOpen(true);
+                setOpen(false);
+              }}
+            >
               + Create new team
             </button>
           </div>

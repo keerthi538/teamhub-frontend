@@ -1,50 +1,64 @@
-import Navbar from "../components/Navbar";
+import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "../store/hooks";
+import axios from "axios";
 
 export default function Dashboard() {
-  // const [currentTeam, setCurrentTeam] = useState("Tigers");
   const user = useAppSelector((state) => state.user);
-  const { currentTeam, name: userName, teams } = user;
+  const { currentTeam } = user;
+  const navigate = useNavigate();
+
+  const createDocument = () => {
+    axios
+      .post(
+        "http://localhost:3000/documents/create",
+        {
+          teamId: currentTeam?.id,
+        },
+        { withCredentials: true },
+      )
+      .then((response) => {
+        console.log("Document created:", response.data);
+        const newDocId = response.data.id;
+        navigate(`/teams/${currentTeam?.id}/documents/${newDocId}`, {
+          state: { title: response.data.title },
+        });
+      });
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#f6f8ff] to-white">
-      <Navbar
-        currentTeam={currentTeam ?? null}
-        userName={userName}
-        teams={teams ?? []}
-      />
+    <main className="mx-auto max-w-7xl px-6 py-10">
+      {currentTeam ? (
+        <>
+          <section className="mb-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <button
+              className="rounded-xl border border-dashed border-[#e6ebf5] bg-white p-6 text-sm text-[#4f7cff] hover:bg-[#f6f8ff] cursor-pointer"
+              onClick={createDocument}
+            >
+              + New document
+            </button>
+            <ActionCard
+              title="Upload documents"
+              description="Add new files to your workspace"
+            />
+            <ActionCard
+              title="Browse documents"
+              description="View and manage your team files"
+            />
+          </section>
 
-      {/* Main content */}
-      <main className="mx-auto max-w-7xl px-6 py-10">
-        {user.currentTeam ? (
-          <>
-            {/* Quick actions */}
-            <section className="mb-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              <ActionCard
-                title="Upload documents"
-                description="Add new files to your workspace"
-              />
-              <ActionCard
-                title="Browse documents"
-                description="View and manage your team files"
-              />
-            </section>
-
-            {/* Recent activity */}
-            <section>
-              <h2 className="mb-4 text-lg font-semibold text-[#0b1220]">
-                Recent activity
-              </h2>
-              <div className="rounded-xl border border-[#e6ebf5] bg-white p-6 text-sm text-[#5b6b8a]">
-                No activity yet. Upload your first document to get started.
-              </div>
-            </section>
-          </>
-        ) : (
-          <EmptyState />
-        )}
-      </main>
-    </div>
+          <section>
+            <h2 className="mb-4 text-lg font-semibold text-[#0b1220]">
+              Recent activity
+            </h2>
+            <div className="rounded-xl border border-[#e6ebf5] bg-white p-6 text-sm text-[#5b6b8a]">
+              No activity yet. Upload your first document to get started.
+            </div>
+          </section>
+        </>
+      ) : (
+        <EmptyState />
+      )}
+    </main>
   );
 }
 

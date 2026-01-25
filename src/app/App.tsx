@@ -1,13 +1,19 @@
 import { Routes, Route } from "react-router-dom";
 import { routes } from "./routes";
-import "./App.css";
+
+function renderRoutes(routes: any[]) {
+  return routes.map(({ path, element, children, index }) => (
+    <Route
+      key={path ?? "index"}
+      path={path}
+      index={index}
+      element={element}
+    >
+      {children && renderRoutes(children)}
+    </Route>
+  ));
+}
 
 export default function App() {
-  return (
-    <Routes>
-      {routes.map(({ path, element }) => (
-        <Route key={path} path={path} element={element} />
-      ))}
-    </Routes>
-  );
+  return <Routes>{renderRoutes(routes)}</Routes>;
 }

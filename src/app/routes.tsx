@@ -1,6 +1,8 @@
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
+import EditorPage from "./components/EditorPage";
 import ProtectedRoute from "./ProtectedRoute";
+import AppLayout from "./AppLayout";
 
 export const routes = [
   {
@@ -11,8 +13,18 @@ export const routes = [
     path: "/",
     element: (
       <ProtectedRoute>
-        <Dashboard />
+        <AppLayout />
       </ProtectedRoute>
     ),
+    children: [
+      {
+        index: true,
+        element: <Dashboard />,
+      },
+      {
+        path: "teams/:teamId/documents/:documentId",
+        element: <EditorPage />,
+      },
+    ],
   },
 ];
