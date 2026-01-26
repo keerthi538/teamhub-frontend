@@ -22,6 +22,9 @@ export default function Dashboard() {
         navigate(`/teams/${currentTeam?.id}/documents/${newDocId}`, {
           state: { title: response.data.title },
         });
+      })
+      .catch((error) => {
+        console.error("Error creating document:", error);
       });
   };
 
