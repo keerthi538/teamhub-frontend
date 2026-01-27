@@ -31,6 +31,21 @@ const Navbar = ({ userName, teams, currentTeam }: NavbarProps) => {
       });
   };
 
+  const handleTeamSelect = (team: Team) => {
+    axios
+      .post(
+        `http://localhost:3000/teams/${team.id}/switch`,
+        {},
+        { withCredentials: true },
+      )
+      .then((resp) => {
+        console.log(resp.data);
+      })
+      .catch((err) => {
+        console.error("Error switching team:", err);
+      });
+  };
+
   return (
     <header className="sticky top-0 z-10 border-b border-[#e6ebf5] bg-white/80 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
@@ -41,7 +56,7 @@ const Navbar = ({ userName, teams, currentTeam }: NavbarProps) => {
           <TeamSwitcher
             teams={teams}
             currentTeam={currentTeam}
-            onSelect={(team) => console.log("Team selected: ", team)}
+            onSelect={handleTeamSelect}
             setIsCreateTeamOpen={setIsCreateTeamOpen}
           />
         </div>

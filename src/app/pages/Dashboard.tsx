@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "../store/hooks";
 import axios from "axios";
+import { useEffect } from "react";
 
 export default function Dashboard() {
   const user = useAppSelector((state) => state.user);
@@ -27,6 +28,17 @@ export default function Dashboard() {
         console.error("Error creating document:", error);
       });
   };
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:3000/documents", { withCredentials: true })
+      .then((response) => {
+        console.log("Fetched documents:", response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching documents:", error);
+      });
+  }, []);
 
   return (
     <main className="mx-auto max-w-7xl px-6 py-10">
