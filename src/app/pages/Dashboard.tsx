@@ -1,12 +1,16 @@
 import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "../store/hooks";
 import axios from "axios";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import type { Document } from "../types";
+import DocumentList from "../components/DocumentList";
 
 export default function Dashboard() {
   const user = useAppSelector((state) => state.user);
   const { currentTeam } = user;
   const navigate = useNavigate();
+
+  const [documents, setDocuments] = useState<Document[]>([]);
 
   const createDocument = () => {
     axios
@@ -29,11 +33,24 @@ export default function Dashboard() {
       });
   };
 
+  const handleDocumentClick = (documentId: number, teamId: number) => {
+    navigate(`/teams/${teamId}/documents/${documentId}`);
+  };
+
   useEffect(() => {
     axios
       .get("http://localhost:3000/documents", { withCredentials: true })
       .then((response) => {
         console.log("Fetched documents:", response.data);
+
+        setDocuments(
+          response.data?.map((doc: any) => ({
+            id: doc.id,
+            title: doc.title,
+            teamId: doc.teamId,
+            authorName: doc.author.name,
+          })),
+        );
       })
       .catch((error) => {
         console.error("Error fetching documents:", error);
@@ -55,9 +72,12 @@ export default function Dashboard() {
               title="Upload documents"
               description="Add new files to your workspace"
             />
-            <ActionCard
-              title="Browse documents"
-              description="View and manage your team files"
+          </section>
+
+          <section className="mb-10">
+            <DocumentList
+              documents={documents}
+              handleDocumentClick={handleDocumentClick}
             />
           </section>
 
