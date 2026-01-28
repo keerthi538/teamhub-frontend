@@ -1,10 +1,11 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 export default function EditorPage() {
   const location = useLocation();
   const { documentId } = useParams();
+  const navigate = useNavigate();
 
   const [title, setTitle] = useState("Untitled document");
   const [content, setContent] = useState("");
@@ -54,6 +55,7 @@ export default function EditorPage() {
         })
         .catch((error) => {
           console.error("Error fetching document:", error);
+          navigate("/");
         });
     };
 
