@@ -2,8 +2,9 @@ import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "../store/hooks";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import type { Document } from "../types";
+import type { Document, TeamMember } from "../types";
 import DocumentList from "../components/DocumentList";
+import { AddTeamMemberDialog } from "../components/AddTeamMemberModal";
 
 export default function Dashboard() {
   const user = useAppSelector((state) => state.user);
@@ -11,6 +12,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
 
   const [documents, setDocuments] = useState<Document[]>([]);
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
 
   const createDocument = () => {
     axios
@@ -30,6 +32,24 @@ export default function Dashboard() {
       })
       .catch((error) => {
         console.error("Error creating document:", error);
+      });
+  };
+
+  const handleTeamMemberAdd = (email: string) => {
+    axios
+      .post(
+        "http://localhost:3000/teams/members/add",
+        {
+          email,
+        },
+        { withCredentials: true },
+      )
+      .then((response) => {
+        console.log("Team member added:", response.data);
+        setTeamMembers((prevMembers) => [...prevMembers, response.data]);
+      })
+      .catch((error) => {
+        console.error("Error adding team member:", error);
       });
   };
 
@@ -55,6 +75,15 @@ export default function Dashboard() {
       .catch((error) => {
         console.error("Error fetching documents:", error);
       });
+
+    axios
+      .get("http://localhost:3000/teams/members", { withCredentials: true })
+      .then((response) => {
+        setTeamMembers(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching team members:", error);
+      });
   }, []);
 
   return (
@@ -72,6 +101,26 @@ export default function Dashboard() {
               title="Upload documents"
               description="Add new files to your workspace"
             />
+          </section>
+
+          {/* Team members badges */}
+          <section className="mb-10">
+            <h2 className="mb-4 text-lg font-semibold text-[#0b1220]">
+              Team members
+            </h2>
+
+            <div className="flex space-x-4">
+              {teamMembers.map((member) => (
+                <div
+                  key={member.id}
+                  className="rounded-full bg-[#e6ebf5] px-4 py-2 text-sm text-[#0b1220]"
+                >
+                  {member.name}
+                </div>
+              ))}
+
+              <AddTeamMemberDialog onAdd={handleTeamMemberAdd} />
+            </div>
           </section>
 
           <section className="mb-10">
