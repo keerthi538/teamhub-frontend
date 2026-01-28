@@ -4,7 +4,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import type { Document, TeamMember } from "../types";
 import DocumentList from "../components/DocumentList";
-import { AddTeamMemberDialog } from "../components/AddTeamMemberModal";
+import { AddTeamMemberDialog } from "../components/AddteamMemberModal";
 
 export default function Dashboard() {
   const user = useAppSelector((state) => state.user);
