@@ -2,17 +2,136 @@ import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "../store/hooks";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import type { Document, TeamMember } from "../types";
+import type { TeamMember } from "../types";
 import DocumentList from "../components/DocumentList";
-import { AddTeamMemberDialog } from "../components/AddteamMemberModal";
+import { AddTeamMemberDialog } from "../components/AddTeamMemberModal";
+import {
+  Star,
+  Bell,
+  Search,
+  ChevronDown,
+  Settings,
+  Users,
+  FileText,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { getNameInitials } from "@/lib/utils";
+
+// Type Definitions
+type DocumentStatus = "PUBLISHED" | "DRAFT" | "INTERNAL";
+type DocumentIconType = "default" | "presentation" | "guide" | "database";
+
+interface Author {
+  initials: string;
+  name: string;
+  color: string;
+}
+
+interface Document {
+  id: number;
+  name: string;
+  author: Author;
+  lastEdited: string;
+  status: DocumentStatus;
+  iconType: DocumentIconType;
+}
+
+interface SidebarNavItemProps {
+  icon: LucideIcon;
+  label: string;
+  active?: boolean;
+  onClick?: () => void;
+}
+
+interface PinnedDocumentItemProps {
+  label: string;
+  active?: boolean;
+  onClick?: () => void;
+}
+
+interface DocumentIconProps {
+  type?: DocumentIconType;
+}
+
+interface AuthorAvatarProps {
+  initials: string;
+  color?: string;
+}
+
+interface StatusBadgeProps {
+  status: DocumentStatus;
+}
+
+const DocumentIcon: React.FC<DocumentIconProps> = ({ type = "default" }) => {
+  const iconStyles: Record<DocumentIconType, string> = {
+    default: "bg-blue-100 text-blue-600",
+    presentation: "bg-orange-100 text-orange-600",
+    guide: "bg-gray-100 text-gray-600",
+    database: "bg-teal-100 text-teal-600",
+  };
+
+  return (
+    <div
+      className={`w-10 h-10 rounded-lg flex items-center justify-center ${iconStyles[type]}`}
+    >
+      <FileText className="w-5 h-5" />
+    </div>
+  );
+};
+
+const AuthorAvatar: React.FC<AuthorAvatarProps> = ({
+  initials,
+  color = "bg-purple-500",
+}) => (
+  <div
+    className={`w-8 h-8 rounded-full ${color} flex items-center justify-center text-white text-xs font-semibold`}
+  >
+    {initials}
+  </div>
+);
+
+// Reusable Status Badge Component
+const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
+  const statusStyles: Record<DocumentStatus, string> = {
+    PUBLISHED: "bg-green-100 text-green-700 border-green-200",
+    DRAFT: "bg-blue-100 text-blue-700 border-blue-200",
+    INTERNAL: "bg-gray-100 text-gray-700 border-gray-200",
+  };
+
+  return (
+    <Badge variant="outline" className={`${statusStyles[status]} font-medium`}>
+      {status}
+    </Badge>
+  );
+};
 
 export default function Dashboard() {
   const user = useAppSelector((state) => state.user);
   const { currentTeam } = user;
   const navigate = useNavigate();
+  const tabs = ["All Docs", "Drafts", "Published"];
 
   const [documents, setDocuments] = useState<Document[]>([]);
+  console.log("Documents state:", documents);
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+  const [activeTab, setActiveTab] = useState<string>("All Docs");
 
   const createDocument = () => {
     axios
@@ -63,14 +182,7 @@ export default function Dashboard() {
       .then((response) => {
         console.log("Fetched documents:", response.data);
 
-        setDocuments(
-          response.data?.map((doc: any) => ({
-            id: doc.id,
-            title: doc.title,
-            teamId: doc.teamId,
-            authorName: doc.author.name,
-          })),
-        );
+        setDocuments(response.data);
       })
       .catch((error) => {
         console.error("Error fetching documents:", error);
@@ -87,62 +199,150 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <main className="mx-auto max-w-7xl px-6 py-10">
-      {currentTeam ? (
-        <>
-          <section className="mb-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <>
+      {/* Header */}
+      <header className="border-b border-gray-200 px-8 py-4">
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-semibold text-gray-900">Documents</h1>
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Input
+                placeholder="Search documents (Cmd+K)"
+                className="pl-10 w-80 bg-gray-50 border-gray-200"
+              />
+              <kbd className="absolute right-3 top-1/2 -translate-y-1/2 px-2 py-1 text-xs bg-white border border-gray-200 rounded">
+                ⌘K
+              </kbd>
+            </div>
+            <Button variant="ghost" size="icon" className="relative">
+              <Bell className="w-5 h-5" />
+              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+            </Button>
+            <Button className="bg-blue-600 hover:bg-blue-700">
+              + New Document
+            </Button>
+          </div>
+        </div>
+      </header>
+
+      {/* Tabs */}
+      <div className="border-b border-gray-200 px-8">
+        <div className="flex items-center gap-6">
+          {tabs.map((tab) => (
             <button
-              className="rounded-xl border border-dashed border-[#e6ebf5] bg-white p-6 text-sm text-[#4f7cff] hover:bg-[#f6f8ff] cursor-pointer"
-              onClick={createDocument}
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`py-4 px-2 font-medium text-sm border-b-2 transition-colors ${
+                activeTab === tab
+                  ? "border-blue-600 text-blue-600"
+                  : "border-transparent text-gray-600 hover:text-gray-900"
+              }`}
             >
-              + New document
+              {tab}
             </button>
-            <ActionCard
-              title="Upload documents"
-              description="Add new files to your workspace"
-            />
-          </section>
+          ))}
+        </div>
+      </div>
 
-          {/* Team members badges */}
-          <section className="mb-10">
-            <h2 className="mb-4 text-lg font-semibold text-[#0b1220]">
-              Team members
-            </h2>
+      {/* Documents Table */}
+      <div className="flex-1 overflow-auto px-8 py-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="text-gray-600">
+                  Sort by: Recently edited
+                  <ChevronDown className="w-4 h-4 ml-2" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start">
+                <DropdownMenuItem>Recently edited</DropdownMenuItem>
+                <DropdownMenuItem>Name (A-Z)</DropdownMenuItem>
+                <DropdownMenuItem>Name (Z-A)</DropdownMenuItem>
+                <DropdownMenuItem>Date created</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
 
-            <div className="flex space-x-4">
-              {teamMembers.map((member) => (
-                <div
-                  key={member.id}
-                  className="rounded-full bg-[#e6ebf5] px-4 py-2 text-sm text-[#0b1220]"
-                >
-                  {member.name}
-                </div>
-              ))}
+        <Table>
+          <TableHeader>
+            <TableRow className="border-gray-200">
+              <TableHead className="text-gray-500 font-medium">
+                DOCUMENT NAME
+              </TableHead>
+              <TableHead className="text-gray-500 font-medium">
+                AUTHOR
+              </TableHead>
+              <TableHead className="text-gray-500 font-medium">
+                LAST EDITED
+              </TableHead>
+              <TableHead className="text-gray-500 font-medium">
+                STATUS
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {documents.map((doc) => (
+              <TableRow
+                key={doc.id}
+                className="border-gray-200 hover:bg-gray-50 cursor-pointer"
+              >
+                <TableCell>
+                  <div className="flex items-center gap-3">
+                    <DocumentIcon type={doc.iconType} />
+                    <span className="font-medium text-gray-900">
+                      {doc.name}
+                    </span>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <AuthorAvatar
+                      initials={getNameInitials(doc.author.name)}
+                      color={doc.author.color ?? "bg-gray-400"}
+                    />
+                    <span className="text-gray-700">{doc.author.name}</span>
+                  </div>
+                </TableCell>
+                <TableCell className="text-gray-600">
+                  {doc.lastEdited}
+                </TableCell>
+                <TableCell>
+                  <StatusBadge status={doc.status} />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
 
-              <AddTeamMemberDialog onAdd={handleTeamMemberAdd} />
-            </div>
-          </section>
-
-          <section className="mb-10">
-            <DocumentList
-              documents={documents}
-              handleDocumentClick={handleDocumentClick}
-            />
-          </section>
-
-          <section>
-            <h2 className="mb-4 text-lg font-semibold text-[#0b1220]">
-              Recent activity
-            </h2>
-            <div className="rounded-xl border border-[#e6ebf5] bg-white p-6 text-sm text-[#5b6b8a]">
-              No activity yet. Upload your first document to get started.
-            </div>
-          </section>
-        </>
-      ) : (
-        <EmptyState />
-      )}
-    </main>
+        {/* Pagination */}
+        <div className="flex items-center justify-between mt-6 pt-6 border-t border-gray-200">
+          <div className="text-sm text-gray-600">
+            Showing <span className="font-medium">5</span> of{" "}
+            <span className="font-medium">128</span> documents
+          </div>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled
+              className="text-gray-400"
+            >
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-gray-700 hover:bg-gray-50"
+            >
+              Next Page
+            </Button>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }
 
