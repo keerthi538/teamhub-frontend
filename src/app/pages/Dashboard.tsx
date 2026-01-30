@@ -51,6 +51,7 @@ interface Document {
   lastEdited: string;
   status: DocumentStatus;
   iconType: DocumentIconType;
+  teamId: number;
 }
 
 interface SidebarNavItemProps {
@@ -288,6 +289,7 @@ export default function Dashboard() {
               <TableRow
                 key={doc.id}
                 className="border-gray-200 hover:bg-gray-50 cursor-pointer"
+                onClick={() => handleDocumentClick(doc.id, doc.teamId)}
               >
                 <TableCell>
                   <div className="flex items-center gap-3">

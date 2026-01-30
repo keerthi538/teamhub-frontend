@@ -7,8 +7,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   Star,
-  Bell,
-  Search,
   ChevronDown,
   Settings,
   Users,
@@ -17,25 +15,6 @@ import {
 } from "lucide-react";
 import { useAppSelector } from "../store/hooks";
 import { selectUser } from "../store/userSlice";
-
-// Type Definitions
-type DocumentStatus = "PUBLISHED" | "DRAFT" | "INTERNAL";
-type DocumentIconType = "default" | "presentation" | "guide" | "database";
-
-interface Author {
-  initials: string;
-  name: string;
-  color: string;
-}
-
-interface Document {
-  id: number;
-  name: string;
-  author: Author;
-  lastEdited: string;
-  status: DocumentStatus;
-  iconType: DocumentIconType;
-}
 
 interface SidebarNavItemProps {
   icon: LucideIcon;
@@ -48,19 +27,6 @@ interface PinnedDocumentItemProps {
   label: string;
   active?: boolean;
   onClick?: () => void;
-}
-
-interface DocumentIconProps {
-  type?: DocumentIconType;
-}
-
-interface AuthorAvatarProps {
-  initials: string;
-  color?: string;
-}
-
-interface StatusBadgeProps {
-  status: DocumentStatus;
 }
 
 const PinnedDocumentItem: React.FC<PinnedDocumentItemProps> = ({
