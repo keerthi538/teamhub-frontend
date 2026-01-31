@@ -3,6 +3,7 @@ import Dashboard from "./pages/Dashboard";
 import EditorPage from "./components/EditorPage";
 import ProtectedRoute from "./ProtectedRoute";
 import AppLayout from "./common/AppLayout";
+import TeamMembers from "./pages/TeamMembers";
 
 export const routes = [
   {
@@ -20,6 +21,10 @@ export const routes = [
       {
         index: true,
         element: <Dashboard />,
+      },
+      {
+        path: "team",
+        element: <TeamMembers />,
       },
       {
         path: "teams/:teamId/documents/:documentId",

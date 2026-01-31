@@ -13,8 +13,10 @@ import {
   FileText,
   type LucideIcon,
 } from "lucide-react";
-import { useAppSelector } from "../store/hooks";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { selectUser } from "../store/userSlice";
+import { useNavigate } from "react-router-dom";
+import { selectActiveNav, setActiveNav } from "../store/globalSlice";
 
 interface SidebarNavItemProps {
   icon: LucideIcon;
@@ -61,8 +63,28 @@ const SidebarNavItem: React.FC<SidebarNavItemProps> = ({
 );
 
 const Sidebar = () => {
-  const [activeNav, setActiveNav] = useState<string>("Documents");
   const user = useAppSelector(selectUser);
+  const navigate = useNavigate();
+  const activeNav = useAppSelector(selectActiveNav);
+  const dispatch = useAppDispatch();
+
+  const handleNavItemClick = (label: string) => {
+    dispatch(setActiveNav(label));
+    // Navigate to corresponding route
+    switch (label) {
+      case "Documents":
+        navigate("/");
+        break;
+      case "Team Members":
+        navigate("/team");
+        break;
+      case "Settings":
+        navigate("/settings");
+        break;
+      default:
+        break;
+    }
+  };
 
   return (
     <aside className="w-64 border-r border-gray-200 flex flex-col">
@@ -96,13 +118,13 @@ const Sidebar = () => {
           icon={FileText}
           label="Documents"
           active={activeNav === "Documents"}
-          onClick={() => setActiveNav("Documents")}
+          onClick={() => handleNavItemClick("Documents")}
         />
         <SidebarNavItem
           icon={Users}
           label="Team Members"
           active={activeNav === "Team Members"}
-          onClick={() => setActiveNav("Team Members")}
+          onClick={() => handleNavItemClick("Team Members")}
         />
         <SidebarNavItem
           icon={Settings}
