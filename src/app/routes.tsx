@@ -1,5 +1,5 @@
 import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
+import Dashboard from "./pages/Documents";
 import EditorPage from "./components/EditorPage";
 import ProtectedRoute from "./ProtectedRoute";
 import AppLayout from "./common/AppLayout";

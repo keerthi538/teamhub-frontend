@@ -1,77 +1,56 @@
-import React, { useState } from "react";
-import InviteTeamMemberModal from "../components/InviteTeamMemberModal";
+import { useEffect, useState } from "react";
+import AddTeamMemberModal from "../components/AddTeamMemberModal";
+import axios from "axios";
+import type { TeamMember } from "../types";
 
 const TeamMembers = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
 
-  const totalMembers = 24;
-
-  const mockMembers = [
-    {
-      id: "1",
-      name: "Alex Rivera",
-      email: "alex@dev-corp.com",
-      avatar: "AR",
-      avatarBg: "bg-gradient-to-br from-amber-400 to-orange-500",
-      role: "Owner",
-      lastActive: "2 mins ago",
-    },
-    {
-      id: "2",
-      name: "Jordan Smith",
-      email: "j.smith@workspace.io",
-      avatar: "JS",
-      avatarBg: "bg-gradient-to-br from-blue-400 to-cyan-500",
-      role: "Editor",
-      lastActive: "1 hour ago",
-    },
-    {
-      id: "3",
-      name: "Sarah Chen",
-      email: "sarah@codebase.dev",
-      avatar: "SC",
-      avatarBg: "bg-gradient-to-br from-purple-400 to-pink-500",
-      role: "Editor",
-      lastActive: "3 hours ago",
-    },
-    {
-      id: "4",
-      name: "Michael Scott",
-      email: "m.scott@paper.com",
-      avatar: "MS",
-      avatarBg: "bg-gradient-to-br from-green-400 to-emerald-500",
-      role: "Viewer",
-      lastActive: "Yesterday",
-    },
-    {
-      id: "5",
-      name: "Taylor Swift",
-      email: "taylor@swift.build",
-      avatar: "TS",
-      avatarBg: "bg-gradient-to-br from-rose-400 to-red-500",
-      role: "Viewer",
-      lastActive: "3 days ago",
-    },
-  ];
-
-  const handleInvite = (email: string, role: "Admin" | "Member" | "Guest") => {
+  const handleAdd = (email: string, role: "Admin" | "Member" | "Guest") => {
     console.log("Inviting:", email, "as", role);
-    // Add your invite logic here
-    setIsModalOpen(false);
+
+    axios
+      .post(
+        "http://localhost:3000/teams/members/add",
+        {
+          email,
+          role,
+        },
+        { withCredentials: true },
+      )
+      .then((response) => {
+        console.log("Team member added:", response.data);
+        setTeamMembers((prevMembers) => [...prevMembers, response.data]);
+        setIsModalOpen(false);
+      })
+      .catch((error) => {
+        console.error("Error adding team member:", error);
+      });
   };
 
-  const getRoleBadgeStyles = (role: "Owner" | "Editor" | "Viewer") => {
+  const getRoleBadgeStyles = (role: "ADMIN" | "MEMBER" | "GUEST") => {
     switch (role) {
-      case "Owner":
+      case "ADMIN":
         return "bg-slate-900 text-white";
-      case "Editor":
+      case "MEMBER":
         return "bg-blue-50 text-blue-700 border border-blue-200";
-      case "Viewer":
+      case "GUEST":
         return "bg-slate-50 text-slate-600 border border-slate-200";
     }
   };
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:3000/teams/members", { withCredentials: true })
+      .then((response) => {
+        setTeamMembers(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching team members:", error);
+      });
+  }, []);
 
   return (
     <>
@@ -115,7 +94,7 @@ const TeamMembers = () => {
                 d="M12 4v16m8-8H4"
               />
             </svg>
-            Invite Member
+            Add Member
           </button>
         </div>
       </header>
@@ -188,7 +167,7 @@ const TeamMembers = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  {mockMembers.map((member, index) => (
+                  {teamMembers.map((member, index) => (
                     <tr
                       key={member.id}
                       className="hover:bg-slate-50 transition-all duration-200 group"
@@ -241,7 +220,7 @@ const TeamMembers = () => {
             </div>
 
             {/* Pagination */}
-            <div className="px-6 py-5 border-t border-slate-200 bg-slate-50/50">
+            {/* <div className="px-6 py-5 border-t border-slate-200 bg-slate-50/50">
               <div className="flex items-center justify-between">
                 <p className="text-sm text-slate-600 font-medium">
                   Showing <span className="font-bold text-slate-900">1</span> to{" "}
@@ -305,15 +284,15 @@ const TeamMembers = () => {
                   </button>
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
 
-      <InviteTeamMemberModal
+      <AddTeamMemberModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onInvite={handleInvite}
+        onAdd={handleAdd}
       />
     </>
   );

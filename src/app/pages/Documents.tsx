@@ -4,7 +4,6 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import type { TeamMember } from "../types";
 import DocumentList from "../components/DocumentList";
-import { AddTeamMemberDialog } from "../components/AddTeamMemberModal";
 import {
   Star,
   Bell,
@@ -131,7 +130,6 @@ export default function Dashboard() {
 
   const [documents, setDocuments] = useState<Document[]>([]);
   console.log("Documents state:", documents);
-  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [activeTab, setActiveTab] = useState<string>("All Docs");
 
   const createDocument = () => {
@@ -155,24 +153,6 @@ export default function Dashboard() {
       });
   };
 
-  const handleTeamMemberAdd = (email: string) => {
-    axios
-      .post(
-        "http://localhost:3000/teams/members/add",
-        {
-          email,
-        },
-        { withCredentials: true },
-      )
-      .then((response) => {
-        console.log("Team member added:", response.data);
-        setTeamMembers((prevMembers) => [...prevMembers, response.data]);
-      })
-      .catch((error) => {
-        console.error("Error adding team member:", error);
-      });
-  };
-
   const handleDocumentClick = (documentId: number, teamId: number) => {
     navigate(`/teams/${teamId}/documents/${documentId}`);
   };
@@ -187,15 +167,6 @@ export default function Dashboard() {
       })
       .catch((error) => {
         console.error("Error fetching documents:", error);
-      });
-
-    axios
-      .get("http://localhost:3000/teams/members", { withCredentials: true })
-      .then((response) => {
-        setTeamMembers(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching team members:", error);
       });
   }, []);
 
