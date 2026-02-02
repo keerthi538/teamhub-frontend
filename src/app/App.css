@@ -1,6 +1,9 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+@import "../styles/_variables.scss";
+@import "../styles/_keyframe-animations.scss";
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -145,4 +148,52 @@
 
     --radius: 0.75rem;
   }
+}
+
+.simple-editor p {
+  color: #0f172a !important;
+}
+
+.simple-editor {
+  color: #0f172a;
+}
+
+/* Also update other text elements */
+.simple-editor h1,
+.simple-editor h2,
+.simple-editor h3,
+.simple-editor h4,
+.simple-editor h5,
+.simple-editor h6 {
+  color: #0f172a !important;
+}
+
+.simple-editor li {
+  color: #0f172a !important;
+}
+
+.simple-editor blockquote {
+  color: #1e293b !important;
+}
+
+/* Code blocks - keep syntax highlighting colors */
+.simple-editor pre,
+.simple-editor pre code {
+  color: #475569 !important; /* or your preferred code color */
+}
+
+/* Inline code */
+.simple-editor code {
+  color: #e11d48 !important; /* pink/red color for inline code */
+  background: #f1f5f9;
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  font-size: 0.9em;
+}
+
+/* But code blocks should override inline code styling */
+.simple-editor pre code {
+  color: #475569 !important;
+  background: none !important;
+  padding: 0 !important;
 }
