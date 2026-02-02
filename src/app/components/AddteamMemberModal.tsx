@@ -3,10 +3,10 @@ import React, { useState } from "react";
 interface AddTeamMemberModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAdd: (email: string, role: "Admin" | "Member" | "Guest") => void;
+  onAdd: (email: string, role: "ADMIN" | "MEMBER" | "VIEWER") => void;
 }
 
-type Role = "Admin" | "Member" | "Guest";
+type Role = "ADMIN" | "MEMBER" | "VIEWER";
 
 const AddTeamMemberModal: React.FC<AddTeamMemberModalProps> = ({
   isOpen,
@@ -14,22 +14,22 @@ const AddTeamMemberModal: React.FC<AddTeamMemberModalProps> = ({
   onAdd,
 }) => {
   const [email, setEmail] = useState("");
-  const [selectedRole, setSelectedRole] = useState<Role>("Member");
+  const [selectedRole, setSelectedRole] = useState<Role>("MEMBER");
 
   const roles: Array<{ value: Role; label: string; description: string }> = [
     {
-      value: "Admin",
+      value: "ADMIN",
       label: "Admin",
       description: "Full access to team settings.",
     },
     {
-      value: "Member",
+      value: "MEMBER",
       label: "Member",
       description: "Can create and edit all documents.",
     },
     {
-      value: "Guest",
-      label: "Guest",
+      value: "VIEWER",
+      label: "Viewer",
       description: "Read-only access and comment capability.",
     },
   ];
@@ -40,7 +40,7 @@ const AddTeamMemberModal: React.FC<AddTeamMemberModalProps> = ({
       console.log("Test");
       onAdd(email, selectedRole);
       setEmail("");
-      setSelectedRole("Member");
+      setSelectedRole("MEMBER");
     }
   };
 
