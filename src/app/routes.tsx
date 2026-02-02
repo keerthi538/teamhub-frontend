@@ -4,6 +4,7 @@ import EditorPage from "./components/EditorPage";
 import ProtectedRoute from "./ProtectedRoute";
 import AppLayout from "./common/AppLayout";
 import TeamMembers from "./pages/TeamMembers";
+import DocumentEditor from "./pages/TipTapEditor";
 
 export const routes = [
   {
@@ -29,6 +30,10 @@ export const routes = [
       {
         path: "teams/:teamId/documents/:documentId",
         element: <EditorPage />,
+      },
+      {
+        path: "editor",
+        element: <DocumentEditor />,
       },
     ],
   },
