@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useEditor, EditorContent } from "@tiptap/react";
+import React, { useEffect, useState } from "react";
+import { useEditor, EditorContent, type Content } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 import CharacterCount from "@tiptap/extension-character-count";
@@ -7,12 +7,28 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Share2, FileText } from "lucide-react";
 import { SimpleEditor } from "@/components/tiptap-templates/simple/simple-editor";
+import axios from "axios";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 const EditorPage = () => {
   const [collaborators] = useState([
     { name: "Sarah M.", avatar: "/avatars/sarah.jpg", color: "#10b981" },
     { name: "John D.", avatar: "/avatars/john.jpg", color: "#3b82f6" },
   ]);
+  const { documentId } = useParams();
+  const navigate = useNavigate();
+
+  const [title, setTitle] = useState("Untitled document");
+  // const [content, setContent] = useState("");
+  const [editorContent, setEditorContent] = useState<Content>({
+    type: "doc",
+    content: [
+      {
+        type: "paragraph",
+        content: [{ type: "text", text: "Start writing..." }],
+      },
+    ],
+  });
 
   const editor = useEditor({
     extensions: [
@@ -26,27 +42,29 @@ const EditorPage = () => {
       }),
       CharacterCount,
     ],
-    content: `
-      <h1>Product Roadmap 2024</h1>
-      <p>Our primary goal for 2024 is to streamline the developer experience. We are focusing on performance, reliability, and real-time collaboration tools. This document outlines our strategic pillars for the upcoming quarters.</p>
-      <h2>Strategic Pillars</h2>
-      <p><strong>Performance First</strong></p>
-      <p>Reduce TTI (Time to Interactive) by 40% across all core modules by optimizing our rendering engine.</p>
-      <p><strong>Collaborative Intelligence</strong></p>
-      <p>Introduce real-time presence, multi-player editing for code blocks, and AI-assisted documentation.</p>
-      <p><strong>Enterprise-Grade Security</strong></p>
-      <p>SOC2 compliance auditing and advanced RBAC for workspace management.</p>
-      <h2>Technical Infrastructure</h2>
-      <p>To support these goals, we will migrate our core data structure to a more robust CRDT implementation:</p>
-      <pre><code>schema.json
+    // content={editorContent}
+    // onChange={setEditorContent}
+    //     content: `
+    //       <h1>Product Roadmap 2024</h1>
+    //       <p>Our primary goal for 2024 is to streamline the developer experience. We are focusing on performance, reliability, and real-time collaboration tools. This document outlines our strategic pillars for the upcoming quarters.</p>
+    //       <h2>Strategic Pillars</h2>
+    //       <p><strong>Performance First</strong></p>
+    //       <p>Reduce TTI (Time to Interactive) by 40% across all core modules by optimizing our rendering engine.</p>
+    //       <p><strong>Collaborative Intelligence</strong></p>
+    //       <p>Introduce real-time presence, multi-player editing for code blocks, and AI-assisted documentation.</p>
+    //       <p><strong>Enterprise-Grade Security</strong></p>
+    //       <p>SOC2 compliance auditing and advanced RBAC for workspace management.</p>
+    //       <h2>Technical Infrastructure</h2>
+    //       <p>To support these goals, we will migrate our core data structure to a more robust CRDT implementation:</p>
+    //       <pre><code>schema.json
 
-{
-  "version": "2.0.0",
-  "engine": "yjs-based-crdt",
-  "persistence": "Postgres-LSM",
-  "realtime": "WebSockets"
-}</code></pre>
-    `,
+    // {
+    //   "version": "2.0.0",
+    //   "engine": "yjs-based-crdt",
+    //   "persistence": "Postgres-LSM",
+    //   "realtime": "WebSockets"
+    // }</code></pre>
+    //     `,
     editorProps: {
       attributes: {
         class: "prose prose-slate max-w-none focus:outline-none px-24 py-16",
@@ -56,6 +74,29 @@ const EditorPage = () => {
 
   const characterCount = editor?.storage.characterCount.characters() || 0;
   const wordCount = editor?.storage.characterCount.words() || 0;
+
+  useEffect(() => {
+    const fetchDocument = async () => {
+      axios
+        .get(`http://localhost:3000/documents/${documentId}`, {
+          withCredentials: true,
+        })
+        .then((response) => {
+          const doc = response.data;
+
+          setTitle(doc.title);
+          // setContent(doc.content);
+        })
+        .catch((error) => {
+          console.error("Error fetching document:", error);
+          navigate("/");
+        });
+    };
+
+    if (documentId) {
+      fetchDocument();
+    }
+  }, [documentId]);
 
   return (
     <>
@@ -70,7 +111,7 @@ const EditorPage = () => {
             </div>
             <div className="w-px h-5 bg-slate-300" />
             <h1 className="text-base font-semibold text-slate-900 tracking-tight">
-              Product Roadmap 2024
+              {title}
             </h1>
           </div>
 
@@ -114,7 +155,7 @@ const EditorPage = () => {
         </div>
       </header>
 
-      <SimpleEditor />
+      <SimpleEditor content={editorContent} onChange={setEditorContent} />
 
       {/* Footer Stats */}
       <footer className="flex-shrink-0 bg-white/80 backdrop-blur-xl border-t border-slate-200/60">

@@ -1,7 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { EditorContent, EditorContext, useEditor } from "@tiptap/react";
+import {
+  EditorContent,
+  EditorContext,
+  useEditor,
+  type Content,
+} from "@tiptap/react";
 
 // --- Tiptap Core Extensions ---
 import { StarterKit } from "@tiptap/starter-kit";
@@ -73,7 +78,7 @@ import { handleImageUpload, MAX_FILE_SIZE } from "@/lib/tiptap-utils";
 // --- Styles ---
 import "@/components/tiptap-templates/simple/simple-editor.scss";
 
-import content from "@/components/tiptap-templates/simple/data/content.json";
+// import content from "@/components/tiptap-templates/simple/data/content.json";
 
 const MainToolbarContent = ({
   onHighlighterClick,
@@ -183,7 +188,13 @@ const MobileToolbarContent = ({
   </>
 );
 
-export function SimpleEditor() {
+export function SimpleEditor({
+  content: controlledContent,
+  onChange,
+}: {
+  content: Content;
+  onChange: (content: Content) => void;
+}) {
   const isMobile = useIsBreakpoint();
   const { height } = useWindowSize();
   const [mobileView, setMobileView] = useState<"main" | "highlighter" | "link">(
@@ -228,8 +239,21 @@ export function SimpleEditor() {
         onError: (error) => console.error("Upload failed:", error),
       }),
     ],
-    content,
+    content: controlledContent,
+    onUpdate: ({ editor }) => {
+      onChange(editor.getJSON());
+    },
   });
+
+  useEffect(() => {
+    if (!editor) return;
+    // Only update if the content actually differs, avoids a loop
+    if (
+      JSON.stringify(editor.getJSON()) !== JSON.stringify(controlledContent)
+    ) {
+      editor.commands.setContent(controlledContent);
+    }
+  }, [editor, controlledContent]);
 
   const rect = useCursorVisibility({
     editor,
