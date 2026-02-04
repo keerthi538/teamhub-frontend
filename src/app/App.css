@@ -201,3 +201,7 @@
 .simple-editor {
   background-color: #c0cde9;
 }
+
+.simple-editor-content {
+  max-width: none !important;
+}
