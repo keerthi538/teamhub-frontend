@@ -188,19 +188,29 @@ const MobileToolbarContent = ({
   </>
 );
 
-export function SimpleEditor({
-  content: controlledContent,
-  onChange,
-}: {
-  content: Content;
-  onChange: (content: Content) => void;
-}) {
+import * as Y from "yjs";
+import { WebsocketProvider } from "y-websocket";
+import Collaboration from "@tiptap/extension-collaboration";
+import CollaborationCursor from "@tiptap/extension-collaboration-cursor";
+
+export function SimpleEditor({ documentId }: { documentId: string }) {
   const isMobile = useIsBreakpoint();
   const { height } = useWindowSize();
   const [mobileView, setMobileView] = useState<"main" | "highlighter" | "link">(
     "main",
   );
   const toolbarRef = useRef<HTMLDivElement>(null);
+
+  // Create Yjs document and provider
+  const [ydoc] = useState(() => new Y.Doc());
+  const [provider] = useState(
+    () =>
+      new WebsocketProvider(
+        "ws://localhost:1234", // Your WebSocket server URL
+        documentId, // Use documentId as the room name
+        ydoc,
+      ),
+  );
 
   const editor = useEditor({
     immediatelyRender: false,
@@ -221,6 +231,18 @@ export function SimpleEditor({
           enableClickSelection: true,
         },
       }),
+      // Add Collaboration extension
+      Collaboration.configure({
+        document: ydoc,
+      }),
+      // Add collaborative cursors
+      CollaborationCursor.configure({
+        provider,
+        user: {
+          name: "User", // You can get this from your auth context
+          color: "#3b82f6", // Random color per user
+        },
+      }),
       HorizontalRule,
       TextAlign.configure({ types: ["heading", "paragraph"] }),
       TaskList,
@@ -239,21 +261,15 @@ export function SimpleEditor({
         onError: (error) => console.error("Upload failed:", error),
       }),
     ],
-    content: controlledContent,
-    onUpdate: ({ editor }) => {
-      onChange(editor.getJSON());
-    },
   });
 
+  // Cleanup on unmount
   useEffect(() => {
-    if (!editor) return;
-    // Only update if the content actually differs, avoids a loop
-    if (
-      JSON.stringify(editor.getJSON()) !== JSON.stringify(controlledContent)
-    ) {
-      editor.commands.setContent(controlledContent);
-    }
-  }, [editor, controlledContent]);
+    return () => {
+      provider?.destroy();
+      ydoc?.destroy();
+    };
+  }, [provider, ydoc]);
 
   const rect = useCursorVisibility({
     editor,

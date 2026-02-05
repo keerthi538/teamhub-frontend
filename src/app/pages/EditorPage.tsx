@@ -17,15 +17,6 @@ const EditorPage = () => {
 
   const [title, setTitle] = useState("Untitled document");
   // const [content, setContent] = useState("");
-  const [editorContent, setEditorContent] = useState<Content>({
-    type: "doc",
-    content: [
-      {
-        type: "paragraph",
-        content: [{ type: "text", text: "Start writing..." }],
-      },
-    ],
-  });
 
   const characterCount = 250;
   const wordCount = 70;
@@ -110,7 +101,7 @@ const EditorPage = () => {
         </div>
       </header>
 
-      <SimpleEditor content={editorContent} onChange={setEditorContent} />
+      <SimpleEditor documentId={documentId!} />
 
       {/* Footer Stats */}
       <footer className="flex-shrink-0 bg-white/80 backdrop-blur-xl border-t border-slate-200/60">
