@@ -191,7 +191,10 @@ export default function Dashboard() {
               <Bell className="w-5 h-5" />
               <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
             </Button>
-            <Button className="bg-blue-600 hover:bg-blue-700">
+            <Button
+              onClick={createDocument}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
               + New Document
             </Button>
           </div>
