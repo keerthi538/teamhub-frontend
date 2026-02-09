@@ -1,16 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Share2, FileText } from "lucide-react";
+import { Share2, FileText, Check, Loader2 } from "lucide-react";
 import { SimpleEditor } from "@/components/tiptap-templates/simple/simple-editor";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
+import { debounce, getNameInitials } from "@/lib/utils";
 
 const EditorPage = () => {
-  const [collaborators] = useState([
-    { name: "Sarah M.", avatar: "/avatars/sarah.jpg", color: "#10b981" },
-    { name: "John D.", avatar: "/avatars/john.jpg", color: "#3b82f6" },
-  ]);
+  const [collaborators, setCollaborators] = useState<
+    Array<{ name: string; color: string }>
+  >([]);
   const { documentId } = useParams();
   const navigate = useNavigate();
 
@@ -18,7 +18,9 @@ const EditorPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [collabToken, setCollabToken] = useState<string | null>(null);
   const [currentUser, setCurrentUser] = useState(null);
-  // const [collaborators, setCollaborators] = useState<any[]>([]);
+  const [isSavingTitle, setIsSavingTitle] = useState(false);
+  const [titleSaved, setTitleSaved] = useState(false);
+  const titleInputRef = useRef<HTMLInputElement>(null);
 
   const characterCount = 250;
   const wordCount = 70;
@@ -60,6 +62,41 @@ const EditorPage = () => {
     fetchDocumentAndToken();
   }, [documentId]);
 
+  const handleTitleChange = async (newTitle: string) => {
+    console.log("Handletitle change", newTitle);
+
+    try {
+      setIsSavingTitle(true);
+      setTitleSaved(false);
+
+      await axios.patch(
+        `http://localhost:3000/documents/${documentId}/title`,
+        { title: newTitle?.trim() },
+        { withCredentials: true },
+      );
+
+      setTitleSaved(true);
+
+      // Hide checkmark after 2 seconds
+      setTimeout(() => {
+        setTitleSaved(false);
+      }, 2000);
+    } catch (error) {
+      console.error("Error saving title:", error);
+    } finally {
+      setIsSavingTitle(false);
+    }
+  };
+
+  const debouncedTitleChange = debounce(handleTitleChange, 1000);
+
+  const handleTitleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      titleInputRef.current?.blur();
+    }
+  };
+
   if (isLoading || !collabToken || !currentUser) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -83,9 +120,28 @@ const EditorPage = () => {
               <span className="font-medium text-slate-700">Engineering</span>
             </div>
             <div className="w-px h-5 bg-slate-300" />
-            <h1 className="text-base font-semibold text-slate-900 tracking-tight">
-              {title}
-            </h1>
+
+            <div className="flex items-center gap-2">
+              <input
+                ref={titleInputRef}
+                type="text"
+                value={title}
+                onChange={(event) => {
+                  console.log("Change");
+                  setTitle(event.target.value);
+                  debouncedTitleChange(event.target.value);
+                }}
+                onKeyDown={handleTitleKeyDown}
+                placeholder="Untitled document"
+                className="text-base font-semibold text-slate-900 tracking-tight bg-transparent border-none outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded px-2 py-1 -ml-2 min-w-[200px] max-w-[400px]"
+              />
+
+              {/* Save Indicator */}
+              {isSavingTitle && (
+                <Loader2 className="w-4 h-4 text-slate-400 animate-spin" />
+              )}
+              {titleSaved && <Check className="w-4 h-4 text-emerald-500" />}
+            </div>
           </div>
 
           {/* Right: Collaborators & Share */}
@@ -99,10 +155,7 @@ const EditorPage = () => {
                     className="w-8 h-8 border-2 border-white ring-2 ring-slate-100 transition-transform hover:scale-110 hover:z-10"
                   >
                     <AvatarFallback className="text-xs font-medium bg-gradient-to-br from-blue-500 to-violet-500 text-white">
-                      {collab.name
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")}
+                      {getNameInitials(collab.name)}
                     </AvatarFallback>
                   </Avatar>
                 ))}
@@ -132,7 +185,7 @@ const EditorPage = () => {
         documentId={documentId!}
         collabToken={collabToken}
         currentUser={currentUser}
-        // onCollaboratorsChange={setCollaborators}
+        handleCollaboratorsChange={setCollaborators}
       />
 
       {/* Footer Stats */}

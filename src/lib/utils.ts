@@ -15,3 +15,16 @@ export function getNameInitials(name: string): string {
 
   return (first + last).toUpperCase();
 }
+
+export function debounce(fn, timeout = 300) {
+  let timer: number;
+
+  return (...args) => {
+    console.log("Trigger");
+    clearTimeout(timer);
+
+    timer = setTimeout(() => {
+      fn.apply(this, args);
+    }, timeout);
+  };
+}

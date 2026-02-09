@@ -186,14 +186,29 @@ import * as Y from "yjs";
 import { HocuspocusProvider } from "@hocuspocus/provider";
 import CollaborationCaret from "@tiptap/extension-collaboration-caret";
 
+interface AwarenessState {
+  clientId: number;
+  user: {
+    name: string;
+    color: string;
+    mouseX: number;
+    mouseY: number;
+  };
+  cursor: null;
+}
+
 export function SimpleEditor({
   documentId,
   collabToken,
   currentUser,
+  handleCollaboratorsChange,
 }: {
   documentId: string;
   collabToken: string;
   currentUser: { id: number; name: string; color: string };
+  handleCollaboratorsChange: (
+    collaborators: Array<{ name: string; color: string }>,
+  ) => void;
 }) {
   const isMobile = useIsBreakpoint();
   const { height } = useWindowSize();
@@ -223,10 +238,18 @@ export function SimpleEditor({
       });
 
       // Listen for updates to the states of all users
-      provider.on("awarenessChange", ({ states }: { states: any }) => {
-        // TODO: Update type
-        console.log(states);
-      });
+      provider.on(
+        "awarenessChange",
+        ({ states }: { states: AwarenessState[] }) => {
+          const collaborators = states?.map((state) => ({
+            id: state.clientId,
+            name: state.user.name,
+            color: state.user.color,
+          }));
+
+          handleCollaboratorsChange(collaborators);
+        },
+      );
 
       document.addEventListener("mousemove", (event) => {
         // Share any information you like

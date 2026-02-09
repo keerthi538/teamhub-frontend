@@ -24,3 +24,8 @@ export type TeamMember = {
   email: string;
   role: Role;
 };
+
+export type Collaborator = {
+  name: string;
+  color: string;
+};
