@@ -193,7 +193,7 @@ export function SimpleEditor({
 }: {
   documentId: string;
   collabToken: string;
-  currentUser: { id: number; name: string };
+  currentUser: { id: number; name: string; color: string };
 }) {
   const isMobile = useIsBreakpoint();
   const { height } = useWindowSize();
@@ -219,7 +219,7 @@ export function SimpleEditor({
       provider.setAwarenessField("user", {
         // Share any information you like
         name: currentUser?.name,
-        color: "#ffcc00",
+        color: currentUser?.color,
       });
 
       // Listen for updates to the states of all users
@@ -232,7 +232,7 @@ export function SimpleEditor({
         // Share any information you like
         provider.setAwarenessField("user", {
           name: currentUser?.name,
-          color: "#ffcc00",
+          color: currentUser?.color,
           mouseX: event.clientX,
           mouseY: event.clientY,
         });
@@ -266,7 +266,7 @@ export function SimpleEditor({
         provider,
         user: {
           name: currentUser?.name,
-          color: "#f783ac",
+          color: currentUser?.color,
         },
       }),
       HorizontalRule,
