@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { type Content } from "@tiptap/react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Share2, FileText } from "lucide-react";
@@ -16,13 +15,51 @@ const EditorPage = () => {
   const navigate = useNavigate();
 
   const [title, setTitle] = useState("Untitled document");
-  // const [content, setContent] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [collabToken, setCollabToken] = useState<string | null>(null);
 
   const characterCount = 250;
   const wordCount = 70;
 
+  // useEffect(() => {
+  //   const fetchDocumentAndToken = async () => {
+  //     if (!documentId) {
+  //       navigate("/");
+  //       return;
+  //     }
+
+  //     try {
+  //       setIsLoading(true);
+
+  //       // Fetch document metadata and collaboration token in parallel
+  //       const [docResponse, tokenResponse] = await Promise.all([
+  //         axios.get(`http://localhost:3000/documents/${documentId}`, {
+  //           withCredentials: true,
+  //         }),
+  //         axios.get(`http://localhost:3000/documents/${documentId}/token`, {
+  //           withCredentials: true,
+  //         }),
+  //       ]);
+
+  //       const doc = docResponse.data;
+  //       const { token } = tokenResponse.data;
+
+  //       setTitle(doc.title);
+  //       setCollabToken(token);
+  //     } catch (error) {
+  //       console.error("Error loading document:", error);
+  //       navigate("/");
+  //     } finally {
+  //       setIsLoading(false);
+  //     }
+  //   };
+
+  //   fetchDocumentAndToken();
+  // }, [documentId]);
+
   useEffect(() => {
     const fetchDocument = async () => {
+      console.log("Fetching document: ", documentId);
       axios
         .get(`http://localhost:3000/documents/${documentId}`, {
           withCredentials: true,
@@ -31,6 +68,7 @@ const EditorPage = () => {
           const doc = response.data;
 
           setTitle(doc.title);
+          // setLoading(false);
           // setContent(doc.content);
         })
         .catch((error) => {

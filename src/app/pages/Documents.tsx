@@ -45,6 +45,7 @@ interface Author {
 
 interface Document {
   id: number;
+  uuid: string;
   name: string;
   author: Author;
   lastEdited: string;
@@ -143,8 +144,8 @@ export default function Dashboard() {
       )
       .then((response) => {
         console.log("Document created:", response.data);
-        const newDocId = response.data.id;
-        navigate(`/teams/${currentTeam?.id}/documents/${newDocId}`, {
+        const newDocUuid = response.data.uuid;
+        navigate(`/teams/${currentTeam?.id}/documents/${newDocUuid}`, {
           state: { title: response.data.title },
         });
       })
@@ -153,8 +154,8 @@ export default function Dashboard() {
       });
   };
 
-  const handleDocumentClick = (documentId: number, teamId: number) => {
-    navigate(`/teams/${teamId}/documents/${documentId}`);
+  const handleDocumentClick = (documentUuid: string, teamId: number) => {
+    navigate(`/teams/${teamId}/documents/${documentUuid}`);
   };
 
   useEffect(() => {
@@ -263,7 +264,7 @@ export default function Dashboard() {
               <TableRow
                 key={doc.id}
                 className="border-gray-200 hover:bg-gray-50 cursor-pointer"
-                onClick={() => handleDocumentClick(doc.id, doc.teamId)}
+                onClick={() => handleDocumentClick(doc.uuid, doc.teamId)}
               >
                 <TableCell>
                   <div className="flex items-center gap-3">

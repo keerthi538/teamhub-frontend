@@ -1,12 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import {
-  EditorContent,
-  EditorContext,
-  useEditor,
-  type Content,
-} from "@tiptap/react";
+import { EditorContent, EditorContext, useEditor } from "@tiptap/react";
 
 // --- Tiptap Core Extensions ---
 import { StarterKit } from "@tiptap/starter-kit";
@@ -77,8 +72,6 @@ import { handleImageUpload, MAX_FILE_SIZE } from "@/lib/tiptap-utils";
 
 // --- Styles ---
 import "@/components/tiptap-templates/simple/simple-editor.scss";
-
-// import content from "@/components/tiptap-templates/simple/data/content.json";
 
 const MainToolbarContent = ({
   onHighlighterClick,
@@ -188,10 +181,9 @@ const MobileToolbarContent = ({
   </>
 );
 
-import * as Y from "yjs";
-import { WebsocketProvider } from "y-websocket";
 import Collaboration from "@tiptap/extension-collaboration";
-import CollaborationCursor from "@tiptap/extension-collaboration-cursor";
+import * as Y from "yjs";
+import { HocuspocusProvider } from "@hocuspocus/provider";
 
 export function SimpleEditor({ documentId }: { documentId: string }) {
   const isMobile = useIsBreakpoint();
@@ -201,16 +193,14 @@ export function SimpleEditor({ documentId }: { documentId: string }) {
   );
   const toolbarRef = useRef<HTMLDivElement>(null);
 
-  // Create Yjs document and provider
   const [ydoc] = useState(() => new Y.Doc());
-  const [provider] = useState(
-    () =>
-      new WebsocketProvider(
-        "ws://localhost:1234", // Your WebSocket server URL
-        documentId, // Use documentId as the room name
-        ydoc,
-      ),
-  );
+  const [provider] = useState(() => {
+    new HocuspocusProvider({
+      name: documentId,
+      url: "ws://localhost:1234",
+      document: ydoc,
+    });
+  });
 
   const editor = useEditor({
     immediatelyRender: false,
@@ -231,17 +221,8 @@ export function SimpleEditor({ documentId }: { documentId: string }) {
           enableClickSelection: true,
         },
       }),
-      // Add Collaboration extension
       Collaboration.configure({
         document: ydoc,
-      }),
-      // Add collaborative cursors
-      CollaborationCursor.configure({
-        provider,
-        user: {
-          name: "User", // You can get this from your auth context
-          color: "#3b82f6", // Random color per user
-        },
       }),
       HorizontalRule,
       TextAlign.configure({ types: ["heading", "paragraph"] }),
@@ -262,14 +243,6 @@ export function SimpleEditor({ documentId }: { documentId: string }) {
       }),
     ],
   });
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      provider?.destroy();
-      ydoc?.destroy();
-    };
-  }, [provider, ydoc]);
 
   const rect = useCursorVisibility({
     editor,
