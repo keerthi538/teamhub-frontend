@@ -17,70 +17,59 @@ const EditorPage = () => {
   const [title, setTitle] = useState("Untitled document");
   const [isLoading, setIsLoading] = useState(true);
   const [collabToken, setCollabToken] = useState<string | null>(null);
+  const [currentUser, setCurrentUser] = useState(null);
+  // const [collaborators, setCollaborators] = useState<any[]>([]);
 
   const characterCount = 250;
   const wordCount = 70;
 
-  // useEffect(() => {
-  //   const fetchDocumentAndToken = async () => {
-  //     if (!documentId) {
-  //       navigate("/");
-  //       return;
-  //     }
-
-  //     try {
-  //       setIsLoading(true);
-
-  //       // Fetch document metadata and collaboration token in parallel
-  //       const [docResponse, tokenResponse] = await Promise.all([
-  //         axios.get(`http://localhost:3000/documents/${documentId}`, {
-  //           withCredentials: true,
-  //         }),
-  //         axios.get(`http://localhost:3000/documents/${documentId}/token`, {
-  //           withCredentials: true,
-  //         }),
-  //       ]);
-
-  //       const doc = docResponse.data;
-  //       const { token } = tokenResponse.data;
-
-  //       setTitle(doc.title);
-  //       setCollabToken(token);
-  //     } catch (error) {
-  //       console.error("Error loading document:", error);
-  //       navigate("/");
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   };
-
-  //   fetchDocumentAndToken();
-  // }, [documentId]);
-
   useEffect(() => {
-    const fetchDocument = async () => {
-      console.log("Fetching document: ", documentId);
-      axios
-        .get(`http://localhost:3000/documents/${documentId}`, {
-          withCredentials: true,
-        })
-        .then((response) => {
-          const doc = response.data;
+    const fetchDocumentAndToken = async () => {
+      if (!documentId) {
+        navigate("/");
+        return;
+      }
 
-          setTitle(doc.title);
-          // setLoading(false);
-          // setContent(doc.content);
-        })
-        .catch((error) => {
-          console.error("Error fetching document:", error);
-          navigate("/");
-        });
+      try {
+        setIsLoading(true);
+
+        // Fetch document metadata and collaboration token in parallel
+        const [docResponse, tokenResponse] = await Promise.all([
+          axios.get(`http://localhost:3000/documents/${documentId}`, {
+            withCredentials: true,
+          }),
+          axios.get(`http://localhost:3000/documents/${documentId}/token`, {
+            withCredentials: true,
+          }),
+        ]);
+
+        const doc = docResponse.data;
+        const { token, user } = tokenResponse.data;
+
+        setTitle(doc.title);
+        setCollabToken(token);
+        setCurrentUser(user);
+      } catch (error) {
+        console.error("Error loading document:", error);
+        navigate("/");
+      } finally {
+        setIsLoading(false);
+      }
     };
 
-    if (documentId) {
-      fetchDocument();
-    }
+    fetchDocumentAndToken();
   }, [documentId]);
+
+  if (isLoading || !collabToken || !currentUser) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-slate-600">Loading document...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -139,7 +128,12 @@ const EditorPage = () => {
         </div>
       </header>
 
-      <SimpleEditor documentId={documentId!} />
+      <SimpleEditor
+        documentId={documentId!}
+        collabToken={collabToken}
+        currentUser={currentUser}
+        // onCollaboratorsChange={setCollaborators}
+      />
 
       {/* Footer Stats */}
       <footer className="flex-shrink-0 bg-white/80 backdrop-blur-xl border-t border-slate-200/60">

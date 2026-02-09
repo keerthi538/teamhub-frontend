@@ -184,8 +184,17 @@ const MobileToolbarContent = ({
 import Collaboration from "@tiptap/extension-collaboration";
 import * as Y from "yjs";
 import { HocuspocusProvider } from "@hocuspocus/provider";
+import CollaborationCaret from "@tiptap/extension-collaboration-caret";
 
-export function SimpleEditor({ documentId }: { documentId: string }) {
+export function SimpleEditor({
+  documentId,
+  collabToken,
+  currentUser,
+}: {
+  documentId: string;
+  collabToken: string;
+  currentUser: { id: number; name: string };
+}) {
   const isMobile = useIsBreakpoint();
   const { height } = useWindowSize();
   const [mobileView, setMobileView] = useState<"main" | "highlighter" | "link">(
@@ -194,13 +203,42 @@ export function SimpleEditor({ documentId }: { documentId: string }) {
   const toolbarRef = useRef<HTMLDivElement>(null);
 
   const [ydoc] = useState(() => new Y.Doc());
-  const [provider] = useState(() => {
-    new HocuspocusProvider({
-      name: documentId,
-      url: "ws://localhost:1234",
-      document: ydoc,
-    });
-  });
+  const [provider] = useState(
+    () =>
+      new HocuspocusProvider({
+        name: documentId,
+        url: "ws://localhost:1234",
+        document: ydoc,
+        token: collabToken,
+      }),
+  );
+
+  useEffect(() => {
+    if (provider && currentUser) {
+      // Set the awareness field for the current user
+      provider.setAwarenessField("user", {
+        // Share any information you like
+        name: currentUser?.name,
+        color: "#ffcc00",
+      });
+
+      // Listen for updates to the states of all users
+      provider.on("awarenessChange", ({ states }: { states: any }) => {
+        // TODO: Update type
+        console.log(states);
+      });
+
+      document.addEventListener("mousemove", (event) => {
+        // Share any information you like
+        provider.setAwarenessField("user", {
+          name: currentUser?.name,
+          color: "#ffcc00",
+          mouseX: event.clientX,
+          mouseY: event.clientY,
+        });
+      });
+    }
+  }, [provider, currentUser]);
 
   const editor = useEditor({
     immediatelyRender: false,
@@ -223,6 +261,13 @@ export function SimpleEditor({ documentId }: { documentId: string }) {
       }),
       Collaboration.configure({
         document: ydoc,
+      }),
+      CollaborationCaret.configure({
+        provider,
+        user: {
+          name: currentUser?.name,
+          color: "#f783ac",
+        },
       }),
       HorizontalRule,
       TextAlign.configure({ types: ["heading", "paragraph"] }),

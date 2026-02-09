@@ -22,6 +22,7 @@
     "@tiptap/core": "^3.19.0",
     "@tiptap/extension-character-count": "^3.18.0",
     "@tiptap/extension-collaboration": "^3.19.0",
+    "@tiptap/extension-collaboration-caret": "^3.19.0",
     "@tiptap/extension-collaboration-cursor": "^3.0.0",
     "@tiptap/extension-document": "^3.18.0",
     "@tiptap/extension-highlight": "^3.19.0",
