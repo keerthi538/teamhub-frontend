@@ -189,6 +189,7 @@ import CollaborationCaret from "@tiptap/extension-collaboration-caret";
 interface AwarenessState {
   clientId: number;
   user: {
+    id: number;
     name: string;
     color: string;
     mouseX: number;
@@ -233,6 +234,7 @@ export function SimpleEditor({
       // Set the awareness field for the current user
       provider.setAwarenessField("user", {
         // Share any information you like
+        id: +currentUser?.id,
         name: currentUser?.name,
         color: currentUser?.color,
       });
@@ -241,11 +243,18 @@ export function SimpleEditor({
       provider.on(
         "awarenessChange",
         ({ states }: { states: AwarenessState[] }) => {
-          const collaborators = states?.map((state) => ({
-            id: state.clientId,
-            name: state.user.name,
-            color: state.user.color,
-          }));
+          const collaborators = Array.from(
+            new Map(
+              states.map((state) => [
+                state.user.id,
+                {
+                  id: state.user.id,
+                  name: state.user.name,
+                  color: state.user.color,
+                },
+              ]),
+            ).values(),
+          );
 
           handleCollaboratorsChange(collaborators);
         },
@@ -254,6 +263,7 @@ export function SimpleEditor({
       document.addEventListener("mousemove", (event) => {
         // Share any information you like
         provider.setAwarenessField("user", {
+          id: +currentUser?.id,
           name: currentUser?.name,
           color: currentUser?.color,
           mouseX: event.clientX,

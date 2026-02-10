@@ -6,6 +6,8 @@ import { SimpleEditor } from "@/components/tiptap-templates/simple/simple-editor
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import { debounce, getNameInitials } from "@/lib/utils";
+import { useAppSelector } from "../store/hooks";
+import { selectUser } from "../store/userSlice";
 
 const EditorPage = () => {
   const [collaborators, setCollaborators] = useState<
@@ -21,6 +23,7 @@ const EditorPage = () => {
   const [isSavingTitle, setIsSavingTitle] = useState(false);
   const [titleSaved, setTitleSaved] = useState(false);
   const titleInputRef = useRef<HTMLInputElement>(null);
+  const user = useAppSelector(selectUser);
 
   const characterCount = 250;
   const wordCount = 70;
@@ -174,7 +177,7 @@ const EditorPage = () => {
             {/* User Avatar */}
             <Avatar className="w-9 h-9 border-2 border-slate-200 shadow-sm">
               <AvatarFallback className="bg-gradient-to-br from-emerald-500 to-teal-500 text-white font-medium">
-                U
+                {getNameInitials(user.name)}
               </AvatarFallback>
             </Avatar>
           </div>
