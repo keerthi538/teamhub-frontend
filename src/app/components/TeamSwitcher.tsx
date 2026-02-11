@@ -1,65 +1,108 @@
-import { useState } from "react";
+import { Check, Plus, Settings } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 import type { Team } from "../types";
 
-export function TeamSwitcher({
-  teams,
-  currentTeam,
-  onSelect,
-  setIsCreateTeamOpen,
-}: {
+interface TeamSwitcherModalProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   teams: Team[];
-  currentTeam: Team | null;
-  onSelect: (team: Team) => void;
-  setIsCreateTeamOpen: (open: boolean) => void;
-}) {
-  const [open, setOpen] = useState(false);
+  currentTeamId: number;
+  handleTeamSelect: (team: Team) => void;
+  onCreateTeam?: () => void;
+  onManageTeams?: () => void;
+}
 
+export function TeamSwitcherModal({
+  open,
+  onOpenChange,
+  teams,
+  currentTeamId,
+  handleTeamSelect,
+  onCreateTeam,
+  onManageTeams,
+}: TeamSwitcherModalProps) {
   return (
-    <div className="relative">
-      {/* Trigger */}
-      <button
-        onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-2 rounded-md bg-[#f6f8ff] px-3 py-1.5 text-sm font-medium text-[#4f7cff] hover:bg-[#e9efff]"
-      >
-        {currentTeam ? currentTeam.name : "Select team"}
-        <span className="text-xs">▾</span>
-      </button>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="p-0 gap-0 max-w-[320px]">
+        <DialogHeader className="px-4 pt-4 pb-3">
+          <DialogTitle className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+            Select team
+          </DialogTitle>
+        </DialogHeader>
 
-      {/* Dropdown */}
-      {open && (
-        <div className="absolute left-0 mt-2 w-56 rounded-lg border border-[#e6ebf5] bg-white shadow-md z-20">
-          <div className="py-1">
-            {teams.map((team) => (
-              <button
-                key={team.id}
-                onClick={() => {
-                  onSelect(team);
-                  setOpen(false);
-                }}
-                className={`w-full px-4 py-2 text-left text-sm hover:bg-[#f6f8ff] ${
-                  currentTeam?.id === team.id
-                    ? "font-medium text-[#4f7cff]"
-                    : "text-[#0b1220]"
-                }`}
-              >
-                {team.name}
-              </button>
-            ))}
-          </div>
-
-          <div className="border-t border-[#e6ebf5]">
+        <div className="px-2 pb-2">
+          {teams.map((team) => (
             <button
-              className="w-full px-4 py-2 text-left text-sm text-[#4f7cff] hover:bg-[#f6f8ff]"
-              onClick={() => {
-                setIsCreateTeamOpen(true);
-                setOpen(false);
-              }}
+              key={team.id}
+              onClick={() => handleTeamSelect(team)}
+              className={cn(
+                "w-full flex items-center gap-3 my-1 px-2 py-2 rounded-md hover:bg-accent transition-colors",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+              )}
             >
-              + Create new team
+              <div
+                className={cn(
+                  "w-10 h-10 rounded-md flex items-center justify-center text-white font-semibold flex-shrink-0",
+                  team.id === currentTeamId ? "bg-black" : "bg-olive-600",
+                )}
+              >
+                {team.name[0]}
+              </div>
+
+              <div className="flex-1 text-left">
+                <div className="font-medium text-sm">{team.name}</div>
+                {/* Can add this later */}
+                {/* <div className="text-xs text-muted-foreground">
+                  {`${team.members} members`}
+                </div> */}
+              </div>
+
+              {team.id === currentTeamId && (
+                <Check className="w-4 h-4 text-blue-600 flex-shrink-0" />
+              )}
             </button>
-          </div>
+          ))}
+
+          <div className="h-px bg-border my-2" />
+
+          {onCreateTeam && (
+            <button
+              onClick={onCreateTeam}
+              className="w-full flex items-center gap-3 px-2 py-2 rounded-md hover:bg-accent transition-colors text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <div className="w-10 h-10 rounded-md border-2 border-dashed border-muted-foreground/30 flex items-center justify-center flex-shrink-0">
+                <Plus className="w-4 h-4 text-muted-foreground" />
+              </div>
+              <div className="flex-1">
+                <div className="font-medium text-sm">Create new team</div>
+              </div>
+              <div className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-muted text-muted-foreground">
+                ⌘N
+              </div>
+            </button>
+          )}
+
+          {onManageTeams && (
+            <button
+              onClick={onManageTeams}
+              className="w-full flex items-center gap-3 px-2 py-2 rounded-md hover:bg-accent transition-colors text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
+                <Settings className="w-5 h-5 text-muted-foreground" />
+              </div>
+              <div className="flex-1">
+                <div className="font-medium text-sm">Manage teams</div>
+              </div>
+            </button>
+          )}
         </div>
-      )}
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

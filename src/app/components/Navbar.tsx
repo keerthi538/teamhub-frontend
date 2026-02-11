@@ -1,7 +1,6 @@
 import axios from "axios";
 import type { Team } from "../types";
 import { CreateTeamModal } from "./CreateTeamModal";
-import { TeamSwitcher } from "./TeamSwitcher";
 import { useState } from "react";
 
 interface NavbarProps {
@@ -52,13 +51,6 @@ const Navbar = ({ userName, teams, currentTeam }: NavbarProps) => {
         {/* Left */}
         <div className="flex items-center gap-6">
           <span className="text-lg font-semibold text-[#0b1220]">TeamHub</span>
-
-          <TeamSwitcher
-            teams={teams}
-            currentTeam={currentTeam}
-            onSelect={handleTeamSelect}
-            setIsCreateTeamOpen={setIsCreateTeamOpen}
-          />
         </div>
 
         {/* Center */}

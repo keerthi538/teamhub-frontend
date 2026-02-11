@@ -14,9 +14,12 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { selectUser } from "../store/userSlice";
+import { fetchMe, selectUser } from "../store/userSlice";
 import { useNavigate } from "react-router-dom";
 import { selectActiveNav, setActiveNav } from "../store/globalSlice";
+import { TeamSwitcherModal } from "../components/TeamSwitcher";
+import type { Team } from "../types";
+import axios from "axios";
 
 interface SidebarNavItemProps {
   icon: LucideIcon;
@@ -67,6 +70,7 @@ const Sidebar = () => {
   const navigate = useNavigate();
   const activeNav = useAppSelector(selectActiveNav);
   const dispatch = useAppDispatch();
+  const [teamSwitcherOpen, setTeamSwitcherOpen] = React.useState(false);
 
   const handleNavItemClick = (label: string) => {
     dispatch(setActiveNav(label));
@@ -84,6 +88,22 @@ const Sidebar = () => {
       default:
         break;
     }
+  };
+
+  const handleTeamSelect = (team: Team) => {
+    axios
+      .post(
+        `http://localhost:3000/teams/${team.id}/switch`,
+        {},
+        { withCredentials: true },
+      )
+      .then(() => {
+        setTeamSwitcherOpen(false);
+        dispatch(fetchMe());
+      })
+      .catch((err) => {
+        console.error("Error switching team:", err);
+      });
   };
 
   return (
@@ -106,7 +126,9 @@ const Sidebar = () => {
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-56">
-            <DropdownMenuItem>Switch Team</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setTeamSwitcherOpen(true)}>
+              Switch Team
+            </DropdownMenuItem>
             <DropdownMenuItem>Team Settings</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -170,6 +192,15 @@ const Sidebar = () => {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+      <TeamSwitcherModal
+        open={teamSwitcherOpen}
+        onOpenChange={setTeamSwitcherOpen}
+        teams={user?.teams ?? []}
+        currentTeamId={user?.currentTeam?.id ?? 0}
+        handleTeamSelect={handleTeamSelect}
+        onCreateTeam={() => console.log("Create team")}
+        onManageTeams={() => console.log("Manage teams")}
+      />
     </aside>
   );
 };

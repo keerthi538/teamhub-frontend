@@ -169,7 +169,7 @@ export default function Dashboard() {
       .catch((error) => {
         console.error("Error fetching documents:", error);
       });
-  }, []);
+  }, [currentTeam]);
 
   return (
     <>
