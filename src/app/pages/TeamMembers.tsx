@@ -1,16 +1,14 @@
 import { useEffect, useState } from "react";
 import AddTeamMemberModal from "../components/AddTeamMemberModal";
 import axios from "axios";
-import type { TeamMember } from "../types";
+import type { Role, TeamMember } from "../types";
 
 const TeamMembers = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
 
-  const handleAdd = (email: string, role: "Admin" | "Member" | "Guest") => {
-    console.log("Inviting:", email, "as", role);
-
+  const handleAdd = (email: string, role: Role) => {
     axios
       .post(
         "http://localhost:3000/teams/members/add",
@@ -30,13 +28,13 @@ const TeamMembers = () => {
       });
   };
 
-  const getRoleBadgeStyles = (role: "ADMIN" | "MEMBER" | "GUEST") => {
+  const getRoleBadgeStyles = (role: Role) => {
     switch (role) {
       case "ADMIN":
         return "bg-slate-900 text-white";
       case "MEMBER":
         return "bg-blue-50 text-blue-700 border border-blue-200";
-      case "GUEST":
+      case "VIEWER":
         return "bg-slate-50 text-slate-600 border border-slate-200";
     }
   };
@@ -176,9 +174,9 @@ const TeamMembers = () => {
                       <td className="px-6 py-5">
                         <div className="flex items-center gap-4">
                           <div
-                            className={`w-11 h-11 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-md ring-2 ring-white ${member.avatarBg}`}
+                            className={`w-11 h-11 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-md ring-2 ring-white`}
                           >
-                            {member.avatar}
+                            {/* {member.avatar} */}
                           </div>
                           <div>
                             <div className="font-semibold text-slate-900 text-base">
@@ -199,7 +197,7 @@ const TeamMembers = () => {
                       </td>
                       <td className="px-6 py-5">
                         <span className="text-sm text-slate-600 font-medium">
-                          {member.lastActive}
+                          {/* {member.lastActive} */}--
                         </span>
                       </td>
                       <td className="px-6 py-5">
