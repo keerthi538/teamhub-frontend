@@ -1,7 +1,7 @@
-import axios from "axios";
 import type { Team } from "../types";
 import { CreateTeamModal } from "./CreateTeamModal";
 import { useState } from "react";
+import apiClient from "@/lib/axios";
 
 interface NavbarProps {
   currentTeam: Team | null;
@@ -14,9 +14,9 @@ const Navbar = ({ userName, teams, currentTeam }: NavbarProps) => {
 
   const createTeam = (teamName: string) => {
     setIsCreateTeamOpen(false);
-    axios
+    apiClient
       .post(
-        "http://localhost:3000/teams/create",
+        "/teams/create",
         {
           teamName,
         },
@@ -31,12 +31,8 @@ const Navbar = ({ userName, teams, currentTeam }: NavbarProps) => {
   };
 
   const handleTeamSelect = (team: Team) => {
-    axios
-      .post(
-        `http://localhost:3000/teams/${team.id}/switch`,
-        {},
-        { withCredentials: true },
-      )
+    apiClient
+      .post(`/teams/${team.id}/switch`, {}, { withCredentials: true })
       .then((resp) => {
         console.log(resp.data);
       })

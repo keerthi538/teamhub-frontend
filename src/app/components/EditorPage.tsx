@@ -1,4 +1,4 @@
-import axios from "axios";
+import apiClient from "@/lib/axios";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 
@@ -15,9 +15,9 @@ export default function EditorPage() {
   const handleSave = async () => {
     setSaving(true);
 
-    axios
+    apiClient
       .put(
-        `http://localhost:3000/documents/${documentId}`,
+        `/documents/${documentId}`,
         {
           title,
           content,
@@ -43,8 +43,8 @@ export default function EditorPage() {
 
   useEffect(() => {
     const fetchDocument = async () => {
-      axios
-        .get(`http://localhost:3000/documents/${documentId}`, {
+      apiClient
+        .get(`/documents/${documentId}`, {
           withCredentials: true,
         })
         .then((response) => {

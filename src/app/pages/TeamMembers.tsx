@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import AddTeamMemberModal from "../components/AddTeamMemberModal";
-import axios from "axios";
 import type { Role, TeamMember } from "../types";
+import apiClient from "@/lib/axios";
 
 const TeamMembers = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -9,9 +9,9 @@ const TeamMembers = () => {
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
 
   const handleAdd = (email: string, role: Role) => {
-    axios
+    apiClient
       .post(
-        "http://localhost:3000/teams/members/add",
+        "/teams/members/add",
         {
           email,
           role,
@@ -40,8 +40,8 @@ const TeamMembers = () => {
   };
 
   useEffect(() => {
-    axios
-      .get("http://localhost:3000/teams/members", { withCredentials: true })
+    apiClient
+      .get("/teams/members", { withCredentials: true })
       .then((response) => {
         setTeamMembers(response.data);
       })

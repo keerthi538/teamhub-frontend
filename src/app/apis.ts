@@ -1,7 +1,7 @@
-import axios from "axios";
+import apiClient from "@/lib/axios";
 
 export const getMe = async () => {
-  const response = await axios.get("http://localhost:3000/users/me", {
+  const response = await apiClient.get("/users/me", {
     withCredentials: true,
   });
 

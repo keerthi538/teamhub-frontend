@@ -19,7 +19,7 @@ import { useNavigate } from "react-router-dom";
 import { selectActiveNav, setActiveNav } from "../store/globalSlice";
 import { TeamSwitcherModal } from "../components/TeamSwitcher";
 import type { Team } from "../types";
-import axios from "axios";
+import apiClient from "@/lib/axios";
 
 interface SidebarNavItemProps {
   icon: LucideIcon;
@@ -91,12 +91,8 @@ const Sidebar = () => {
   };
 
   const handleTeamSelect = (team: Team) => {
-    axios
-      .post(
-        `http://localhost:3000/teams/${team.id}/switch`,
-        {},
-        { withCredentials: true },
-      )
+    apiClient
+      .post(`/teams/${team.id}/switch`, {}, { withCredentials: true })
       .then(() => {
         setTeamSwitcherOpen(false);
         dispatch(fetchMe());

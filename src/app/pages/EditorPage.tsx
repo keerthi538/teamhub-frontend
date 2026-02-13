@@ -3,11 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Share2, FileText, Check, Loader2 } from "lucide-react";
 import { SimpleEditor } from "@/components/tiptap-templates/simple/simple-editor";
-import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import { debounce, getNameInitials } from "@/lib/utils";
 import { useAppSelector } from "../store/hooks";
 import { selectUser } from "../store/userSlice";
+import apiClient from "@/lib/axios";
 
 const EditorPage = () => {
   const [collaborators, setCollaborators] = useState<
@@ -40,10 +40,10 @@ const EditorPage = () => {
 
         // Fetch document metadata and collaboration token in parallel
         const [docResponse, tokenResponse] = await Promise.all([
-          axios.get(`http://localhost:3000/documents/${documentId}`, {
+          apiClient.get(`/documents/${documentId}`, {
             withCredentials: true,
           }),
-          axios.get(`http://localhost:3000/documents/${documentId}/token`, {
+          apiClient.get(`/documents/${documentId}/token`, {
             withCredentials: true,
           }),
         ]);
@@ -72,8 +72,8 @@ const EditorPage = () => {
       setIsSavingTitle(true);
       setTitleSaved(false);
 
-      await axios.patch(
-        `http://localhost:3000/documents/${documentId}/title`,
+      await apiClient.patch(
+        `/documents/${documentId}/title`,
         { title: newTitle?.trim() },
         { withCredentials: true },
       );

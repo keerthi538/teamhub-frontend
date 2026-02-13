@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "../store/hooks";
-import axios from "axios";
 import { useEffect, useState } from "react";
 import type { TeamMember } from "../types";
 import DocumentList from "../components/DocumentList";
@@ -32,6 +31,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { getNameInitials } from "@/lib/utils";
+import apiClient from "@/lib/axios";
 
 // Type Definitions
 type DocumentStatus = "PUBLISHED" | "DRAFT" | "INTERNAL";
@@ -134,9 +134,9 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState<string>("All Docs");
 
   const createDocument = () => {
-    axios
+    apiClient
       .post(
-        "http://localhost:3000/documents/create",
+        "/documents/create",
         {
           teamId: currentTeam?.id,
         },
@@ -159,8 +159,8 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
-    axios
-      .get("http://localhost:3000/documents", { withCredentials: true })
+    apiClient
+      .get("/documents", { withCredentials: true })
       .then((response) => {
         console.log("Fetched documents:", response.data);
 
