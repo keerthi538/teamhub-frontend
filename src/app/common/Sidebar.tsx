@@ -20,6 +20,7 @@ import { selectActiveNav, setActiveNav } from "../store/globalSlice";
 import { TeamSwitcherModal } from "../components/TeamSwitcher";
 import type { Team } from "../types";
 import apiClient from "@/lib/axios";
+import CreateTeamModal from "../components/CreateTeamModal2";
 
 interface SidebarNavItemProps {
   icon: LucideIcon;
@@ -70,7 +71,8 @@ const Sidebar = () => {
   const navigate = useNavigate();
   const activeNav = useAppSelector(selectActiveNav);
   const dispatch = useAppDispatch();
-  const [teamSwitcherOpen, setTeamSwitcherOpen] = React.useState(false);
+  const [teamSwitcherOpen, setTeamSwitcherOpen] = useState(false);
+  const [teamCreateModalOpen, setTeamCreateModalOpen] = useState(false);
 
   const handleNavItemClick = (label: string) => {
     dispatch(setActiveNav(label));
@@ -124,6 +126,9 @@ const Sidebar = () => {
           <DropdownMenuContent align="start" className="w-56">
             <DropdownMenuItem onClick={() => setTeamSwitcherOpen(true)}>
               Switch Team
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setTeamCreateModalOpen(true)}>
+              Create New Team
             </DropdownMenuItem>
             <DropdownMenuItem>Team Settings</DropdownMenuItem>
           </DropdownMenuContent>
@@ -188,6 +193,7 @@ const Sidebar = () => {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+
       <TeamSwitcherModal
         open={teamSwitcherOpen}
         onOpenChange={setTeamSwitcherOpen}
@@ -196,6 +202,11 @@ const Sidebar = () => {
         handleTeamSelect={handleTeamSelect}
         onCreateTeam={() => console.log("Create team")}
         onManageTeams={() => console.log("Manage teams")}
+      />
+
+      <CreateTeamModal
+        isOpen={teamCreateModalOpen}
+        setIsOpen={setTeamCreateModalOpen}
       />
     </aside>
   );
