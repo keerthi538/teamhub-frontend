@@ -20,7 +20,7 @@ import { selectActiveNav, setActiveNav } from "../store/globalSlice";
 import { TeamSwitcherModal } from "../components/TeamSwitcher";
 import type { Team } from "../types";
 import apiClient from "@/lib/axios";
-import CreateTeamModal from "../components/CreateTeamModal2";
+import CreateTeamModal from "../components/CreateTeamModal";
 
 interface SidebarNavItemProps {
   icon: LucideIcon;
@@ -101,6 +101,24 @@ const Sidebar = () => {
       })
       .catch((err) => {
         console.error("Error switching team:", err);
+      });
+  };
+
+  const handleCreateTeam = (teamName: string) => {
+    apiClient
+      .post(
+        "/teams/create",
+        {
+          teamName,
+        },
+        { withCredentials: true },
+      )
+      .then((resp) => {
+        console.log(resp.data);
+        dispatch(fetchMe());
+      })
+      .catch((err) => {
+        console.error("Error creating team:", err);
       });
   };
 
@@ -207,6 +225,7 @@ const Sidebar = () => {
       <CreateTeamModal
         isOpen={teamCreateModalOpen}
         setIsOpen={setTeamCreateModalOpen}
+        handleCreateTeam={handleCreateTeam}
       />
     </aside>
   );
