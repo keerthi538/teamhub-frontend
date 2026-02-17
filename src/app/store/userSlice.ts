@@ -4,7 +4,6 @@ import { getMe } from "../apis";
 
 export const fetchMe = createAsyncThunk("me/fetch", getMe);
 
-// Define a type for the slice state
 interface UserState {
   id: number;
   email: string;
