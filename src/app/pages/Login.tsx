@@ -20,7 +20,8 @@ export default function Login() {
         {/* Google login */}
         <button
           onClick={() => {
-            window.location.href = "http://localhost:3000/auth/login";
+            window.location.href =
+              import.meta.env.VITE_API_BASE_URL + "/auth/login";
           }}
           className="flex w-full items-center justify-center gap-3 rounded-lg border border-[#e6ebf5] bg-white py-2.5 text-sm font-medium text-[#0b1220] transition hover:bg-[#f6f8ff]"
         >
