@@ -138,7 +138,7 @@ const DocumentList = ({
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start">
-                  <DropdownMenuItem>Recently edited </DropdownMenuItem>
+                  <DropdownMenuItem>Recently edited</DropdownMenuItem>
                   <DropdownMenuItem>Name (A-Z)</DropdownMenuItem>
                   <DropdownMenuItem>Name (Z-A)</DropdownMenuItem>
                   <DropdownMenuItem>Date created</DropdownMenuItem>
