@@ -226,7 +226,7 @@ const DocumentList = ({
         </div>
       ) : (
         <div className="rounded-xl border border-[#e6ebf5] bg-white p-6 text-sm text-[#5b6b8a]">
-          You have no documents yet. Create or upload a document to get started.
+          You have no documents yet. Create a document to get started.
         </div>
       )}
     </>
