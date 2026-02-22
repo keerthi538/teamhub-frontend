@@ -223,7 +223,7 @@ export function SimpleEditor({
     () =>
       new HocuspocusProvider({
         name: documentId,
-        url: "ws://localhost:1234",
+        url: import.meta.env.VITE_COLLAB_WS_BASE_URL,
         document: ydoc,
         token: collabToken,
       }),
