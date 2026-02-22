@@ -207,7 +207,7 @@ const EditorPage = () => {
           </div>
           <div className="flex items-center gap-2 text-xs text-slate-500">
             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="font-medium text-emerald-600">CLOUD SYNCED</span>
+            <span className="font-medium text-emerald-600">CLOUD SYNCED </span>
           </div>
         </div>
       </footer>
