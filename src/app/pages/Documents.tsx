@@ -36,7 +36,6 @@ export default function Dashboard() {
   const tabs = ["All Docs", "Drafts", "Published"];
 
   const [documents, setDocuments] = useState<Document[]>([]);
-  console.log("Documents state:", documents);
   const [activeTab, setActiveTab] = useState<string>("All Docs");
 
   const createDocument = () => {
@@ -101,6 +100,7 @@ export default function Dashboard() {
             <Button
               onClick={createDocument}
               className="bg-blue-600 hover:bg-blue-700"
+              disabled={!currentTeam?.id}
             >
               + New Document
             </Button>
@@ -131,6 +131,7 @@ export default function Dashboard() {
       <DocumentList
         documents={documents}
         handleDocumentClick={handleDocumentClick}
+        currentTeam={currentTeam}
       />
     </>
   );

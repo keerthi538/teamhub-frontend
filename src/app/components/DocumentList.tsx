@@ -26,6 +26,8 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import EmptyDocumentList from "./EmptyDocumentList";
+import { Team } from "../types";
 
 // Type Definitions
 type DocumentStatus = "PUBLISHED" | "DRAFT" | "INTERNAL";
@@ -120,9 +122,11 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
 const DocumentList = ({
   documents,
   handleDocumentClick,
+  currentTeam,
 }: {
   documents: Document[];
   handleDocumentClick: (documentId: string, teamId: number) => void;
+  currentTeam: Team | null;
 }) => {
   return (
     <>
@@ -225,9 +229,7 @@ const DocumentList = ({
           </div>
         </div>
       ) : (
-        <div className="rounded-xl border border-[#e6ebf5] bg-white p-6 text-sm text-[#5b6b8a]">
-          You have no documents yet. Create a document to get started.
-        </div>
+        <EmptyDocumentList currentTeam={currentTeam} />
       )}
     </>
   );

@@ -1,8 +1,18 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { RootState } from "../../app/store";
-import { getMe } from "../apis";
+import { getMe, createTeam as createTeamAPI } from "../apis";
 
 export const fetchMe = createAsyncThunk("me/fetch", getMe);
+
+export const createTeam = createAsyncThunk(
+  "team/create",
+  async (teamName: string, { dispatch }) => {
+    const result = await createTeamAPI(teamName);
+    // Automatically fetch updated user data after creating team
+    dispatch(fetchMe());
+    return result;
+  },
+);
 
 interface UserState {
   id: number;

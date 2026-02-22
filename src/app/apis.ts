@@ -16,3 +16,12 @@ export const getMe = async () => {
     currentTeam,
   };
 };
+
+export const createTeam = async (teamName: string) => {
+  const response = await apiClient.post(
+    "/teams/create",
+    { teamName },
+    { withCredentials: true },
+  );
+  return response.data;
+};
