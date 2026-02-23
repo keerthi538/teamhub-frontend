@@ -123,10 +123,12 @@ const DocumentList = ({
   documents,
   handleDocumentClick,
   currentTeam,
+  handleCreateDocument,
 }: {
   documents: Document[];
   handleDocumentClick: (documentId: string, teamId: number) => void;
   currentTeam: Team | null;
+  handleCreateDocument: () => void;
 }) => {
   return (
     <>
@@ -229,7 +231,10 @@ const DocumentList = ({
           </div>
         </div>
       ) : (
-        <EmptyDocumentList currentTeam={currentTeam} />
+        <EmptyDocumentList
+          currentTeam={currentTeam}
+          handleCreateDocument={handleCreateDocument}
+        />
       )}
     </>
   );

@@ -7,9 +7,13 @@ import { createTeam } from "../store/userSlice";
 
 interface EmptyDocumentListProps {
   currentTeam: Team | null;
+  handleCreateDocument: () => void;
 }
 
-const EmptyDocumentList = ({ currentTeam }: EmptyDocumentListProps) => {
+const EmptyDocumentList = ({
+  currentTeam,
+  handleCreateDocument,
+}: EmptyDocumentListProps) => {
   const dispatch = useAppDispatch();
   const [teamCreateModalOpen, setTeamCreateModalOpen] = useState(false);
 
@@ -46,9 +50,7 @@ const EmptyDocumentList = ({ currentTeam }: EmptyDocumentListProps) => {
           Start by creating your first document.
         </p>
         <Button
-          onClick={() => {
-            // Logic to open document creation modal or navigate to document creation page
-          }}
+          onClick={handleCreateDocument}
           className="bg-blue-600 hover:bg-blue-700"
         >
           + New Document
