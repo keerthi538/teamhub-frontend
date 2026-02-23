@@ -14,7 +14,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { fetchMe, selectUser } from "../store/userSlice";
+import { fetchMe, createTeam, selectUser } from "../store/userSlice";
 import { useNavigate } from "react-router-dom";
 import { selectActiveNav, setActiveNav } from "../store/globalSlice";
 import { TeamSwitcherModal } from "../components/TeamSwitcher";
@@ -105,21 +105,7 @@ const Sidebar = () => {
   };
 
   const handleCreateTeam = (teamName: string) => {
-    apiClient
-      .post(
-        "/teams/create",
-        {
-          teamName,
-        },
-        { withCredentials: true },
-      )
-      .then((resp) => {
-        console.log(resp.data);
-        dispatch(fetchMe());
-      })
-      .catch((err) => {
-        console.error("Error creating team:", err);
-      });
+    dispatch(createTeam(teamName));
   };
 
   return (
@@ -218,7 +204,10 @@ const Sidebar = () => {
         teams={user?.teams ?? []}
         currentTeamId={user?.currentTeam?.id ?? 0}
         handleTeamSelect={handleTeamSelect}
-        onCreateTeam={() => console.log("Create team")}
+        onCreateTeam={() => {
+          setTeamCreateModalOpen(true);
+          setTeamSwitcherOpen(false);
+        }}
         onManageTeams={() => console.log("Manage teams")}
       />
 

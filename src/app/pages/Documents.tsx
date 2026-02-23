@@ -36,10 +36,9 @@ export default function Dashboard() {
   const tabs = ["All Docs", "Drafts", "Published"];
 
   const [documents, setDocuments] = useState<Document[]>([]);
-  console.log("Documents state:", documents);
   const [activeTab, setActiveTab] = useState<string>("All Docs");
 
-  const createDocument = () => {
+  const handleCreateDocument = () => {
     apiClient
       .post(
         "/documents/create",
@@ -49,7 +48,6 @@ export default function Dashboard() {
         { withCredentials: true },
       )
       .then((response) => {
-        console.log("Document created:", response.data);
         const newDocUuid = response.data.uuid;
         navigate(`/teams/${currentTeam?.id}/documents/${newDocUuid}`, {
           state: { title: response.data.title },
@@ -99,8 +97,9 @@ export default function Dashboard() {
               <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
             </Button>
             <Button
-              onClick={createDocument}
+              onClick={handleCreateDocument}
               className="bg-blue-600 hover:bg-blue-700"
+              disabled={!currentTeam?.id}
             >
               + New Document
             </Button>
@@ -131,6 +130,8 @@ export default function Dashboard() {
       <DocumentList
         documents={documents}
         handleDocumentClick={handleDocumentClick}
+        currentTeam={currentTeam}
+        handleCreateDocument={handleCreateDocument}
       />
     </>
   );
