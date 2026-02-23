@@ -48,7 +48,6 @@ export default function Dashboard() {
         { withCredentials: true },
       )
       .then((response) => {
-        console.log("Document created:", response.data);
         const newDocUuid = response.data.uuid;
         navigate(`/teams/${currentTeam?.id}/documents/${newDocUuid}`, {
           state: { title: response.data.title },

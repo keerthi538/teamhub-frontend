@@ -204,7 +204,10 @@ const Sidebar = () => {
         teams={user?.teams ?? []}
         currentTeamId={user?.currentTeam?.id ?? 0}
         handleTeamSelect={handleTeamSelect}
-        onCreateTeam={() => console.log("Create team")}
+        onCreateTeam={() => {
+          setTeamCreateModalOpen(true);
+          setTeamSwitcherOpen(false);
+        }}
         onManageTeams={() => console.log("Manage teams")}
       />
 

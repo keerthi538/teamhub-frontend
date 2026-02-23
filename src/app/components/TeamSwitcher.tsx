@@ -82,9 +82,6 @@ export function TeamSwitcherModal({
               <div className="flex-1">
                 <div className="font-medium text-sm">Create new team</div>
               </div>
-              <div className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-muted text-muted-foreground">
-                ⌘N
-              </div>
             </button>
           )}
 
