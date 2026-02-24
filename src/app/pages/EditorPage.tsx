@@ -9,6 +9,8 @@ import { useAppSelector } from "../store/hooks";
 import { selectUser } from "../store/userSlice";
 import apiClient from "@/lib/axios";
 
+const MAX_COLLABORATORS_DISPLAYED = 4;
+
 const EditorPage = () => {
   const [collaborators, setCollaborators] = useState<
     Array<{ name: string; color: string }>
@@ -27,6 +29,18 @@ const EditorPage = () => {
 
   const characterCount = 250;
   const wordCount = 70;
+
+  const visibleCollaborators = collaborators.slice(
+    0,
+    MAX_COLLABORATORS_DISPLAYED,
+  );
+  const extraCollaboratorsCount =
+    collaborators.length - MAX_COLLABORATORS_DISPLAYED;
+
+  const extraCollaboratorsNames = collaborators
+    .slice(MAX_COLLABORATORS_DISPLAYED)
+    .map((collab) => collab.name)
+    .join(", ");
 
   useEffect(() => {
     const fetchDocumentAndToken = async () => {
@@ -152,19 +166,26 @@ const EditorPage = () => {
             {/* Collaborators */}
             <div className="flex items-center gap-2">
               <div className="flex -space-x-2">
-                {collaborators.map((collab, idx) => (
+                {visibleCollaborators.map((collab, idx) => (
                   <Avatar
                     key={idx}
                     className="w-8 h-8 border-2 border-white ring-2 ring-slate-100 transition-transform hover:scale-110 hover:z-10"
+                    title={collab.name}
                   >
                     <AvatarFallback className="text-xs font-medium bg-gradient-to-br from-blue-500 to-violet-500 text-white">
                       {getNameInitials(collab.name)}
                     </AvatarFallback>
                   </Avatar>
                 ))}
-                <div className="w-8 h-8 rounded-full bg-slate-100 border-2 border-white ring-2 ring-slate-100 flex items-center justify-center text-xs font-medium text-slate-600 transition-transform hover:scale-110 hover:z-10">
-                  +2
-                </div>
+
+                {extraCollaboratorsCount > 0 && (
+                  <div
+                    title={extraCollaboratorsNames}
+                    className="w-8 h-8 rounded-full bg-slate-100 border-2 border-white ring-2 ring-slate-100 flex items-center justify-center text-xs font-medium text-slate-600 transition-transform hover:scale-110 hover:z-10"
+                  >
+                    +{extraCollaboratorsCount}
+                  </div>
+                )}
               </div>
             </div>
 

@@ -21,6 +21,8 @@ import { TeamSwitcherModal } from "../components/TeamSwitcher";
 import type { Team } from "../types";
 import apiClient from "@/lib/axios";
 import CreateTeamModal from "../components/CreateTeamModal";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { getNameInitials } from "@/lib/utils";
 
 interface SidebarNavItemProps {
   icon: LucideIcon;
@@ -108,6 +110,10 @@ const Sidebar = () => {
     dispatch(createTeam(teamName));
   };
 
+  const handleSignOut = () => {
+    window.location.href = `${import.meta.env.VITE_API_BASE_URL}/auth/logout`;
+  };
+
   return (
     <aside className="w-64 border-r border-gray-200 flex flex-col">
       {/* Company Header */}
@@ -178,9 +184,14 @@ const Sidebar = () => {
           <DropdownMenuTrigger asChild>
             <button className="w-full flex items-center gap-3 hover:bg-gray-50 p-2 rounded-lg transition-colors">
               {/* profile icon */}
-              <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center text-white font-bold text-lg">
-                {user?.name ? user.name.charAt(0).toUpperCase() : "U"}
-              </div>
+              <Avatar
+                className="w-8 h-8 border-2 border-white ring-2 ring-slate-100 transition-transform hover:scale-110 hover:z-10"
+                title={user?.name}
+              >
+                <AvatarFallback className="text-xs font-medium bg-gradient-to-br from-blue-500 to-violet-500 text-white">
+                  {getNameInitials(user?.name || "")}
+                </AvatarFallback>
+              </Avatar>
 
               <div className="flex-1 text-left">
                 <div className="font-medium text-gray-900 text-sm">
@@ -193,7 +204,9 @@ const Sidebar = () => {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-56">
             <DropdownMenuItem>Profile</DropdownMenuItem>
-            <DropdownMenuItem>Sign Out</DropdownMenuItem>
+            <DropdownMenuItem onClick={handleSignOut}>
+              Sign Out
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
