@@ -20,7 +20,6 @@ export function debounce(fn, timeout = 300) {
   let timer: number;
 
   return (...args) => {
-    console.log("Trigger");
     clearTimeout(timer);
 
     timer = setTimeout(() => {

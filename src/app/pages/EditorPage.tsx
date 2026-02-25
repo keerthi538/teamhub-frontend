@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Share2, FileText, Check, Loader2 } from "lucide-react";
@@ -105,7 +105,10 @@ const EditorPage = () => {
     }
   };
 
-  const debouncedTitleChange = debounce(handleTitleChange, 1000);
+  const debouncedTitleChange = useMemo(
+    () => debounce(handleTitleChange, 1000),
+    [],
+  );
 
   const handleTitleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
