@@ -8,6 +8,14 @@ const TeamMembers = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
 
+  const filteredMembers = teamMembers.filter((member) => {
+    const query = searchQuery.toLowerCase();
+    return (
+      member.name.toLowerCase().includes(query) ||
+      member.email.toLowerCase().includes(query)
+    );
+  });
+
   const handleAdd = (email: string, role: Role) => {
     apiClient
       .post(
@@ -165,7 +173,7 @@ const TeamMembers = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  {teamMembers.map((member, index) => (
+                  {filteredMembers.map((member, index) => (
                     <tr
                       key={member.id}
                       className="hover:bg-slate-50 transition-all duration-200 group"
