@@ -13,7 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getNameInitials } from "@/lib/utils";
+import { getNameInitials, timeAgo } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Star,
@@ -28,6 +28,7 @@ import type { LucideIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import EmptyDocumentList from "./EmptyDocumentList";
 import { Team } from "../types";
+import { useEffect, useState } from "react";
 
 // Type Definitions
 type DocumentStatus = "PUBLISHED" | "DRAFT" | "INTERNAL";
@@ -130,6 +131,16 @@ const DocumentList = ({
   currentTeam: Team | null;
   handleCreateDocument: () => void;
 }) => {
+  const [now, setNow] = useState(Date.now());
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setNow(Date.now());
+    }, 60000); // Update every minute
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <>
       {documents.length > 0 ? (
@@ -195,7 +206,7 @@ const DocumentList = ({
                     </div>
                   </TableCell>
                   <TableCell className="text-gray-600">
-                    {doc.lastEdited}
+                    {timeAgo(doc.lastEdited, now)}
                   </TableCell>
                   <TableCell>
                     <StatusBadge status={doc.status} />
