@@ -27,7 +27,6 @@ const TeamMembers = () => {
         { withCredentials: true },
       )
       .then((response) => {
-        console.log("Team member added:", response.data);
         setTeamMembers((prevMembers) => [...prevMembers, response.data]);
         setIsModalOpen(false);
       })

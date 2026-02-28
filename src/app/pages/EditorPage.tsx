@@ -160,7 +160,6 @@ const EditorPage = () => {
                 type="text"
                 value={title}
                 onChange={(event) => {
-                  console.log("Change");
                   setTitle(event.target.value);
                   debouncedTitleChange(event.target.value);
                 }}

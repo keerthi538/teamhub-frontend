@@ -29,13 +29,8 @@ export function debounce(fn, timeout = 300) {
 }
 
 export function timeAgo(dateString: string, now: number): string {
-  // const nowDate = new Date(now);
   const date = new Date(dateString);
   const diffInSeconds = Math.floor((now - date.getTime()) / 1000);
-
-  console.log(
-    `Calculating time ago for date: ${dateString}, now: ${new Date(now).toISOString()}, diffInSeconds: ${diffInSeconds}`,
-  );
 
   const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
 

@@ -66,8 +66,6 @@ export default function Dashboard() {
     apiClient
       .get("/documents", { withCredentials: true })
       .then((response) => {
-        console.log("Fetched documents:", response.data);
-
         setDocuments(response.data);
       })
       .catch((error) => {

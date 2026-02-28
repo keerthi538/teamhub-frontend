@@ -47,7 +47,6 @@ export const userSlice = createSlice({
         state.status = "loading";
       })
       .addCase(fetchMe.fulfilled, (state, action) => {
-        console.log("Fetched user:", action.payload);
         state.status = "succeeded";
         state.id = action.payload.id;
         state.email = action.payload.email;
