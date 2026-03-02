@@ -38,6 +38,12 @@ export default function Dashboard() {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [activeTab, setActiveTab] = useState<string>("All Docs");
 
+  const filteredDocuments = documents.filter((doc) => {
+    if (activeTab === "Drafts") return doc.status === "DRAFT";
+    if (activeTab === "Published") return doc.status === "PUBLISHED";
+    return true; // For "All Docs"
+  });
+
   const handleCreateDocument = () => {
     apiClient
       .post(
@@ -126,7 +132,7 @@ export default function Dashboard() {
 
       {/* Documents Table */}
       <DocumentList
-        documents={documents}
+        documents={filteredDocuments}
         handleDocumentClick={handleDocumentClick}
         currentTeam={currentTeam}
         handleCreateDocument={handleCreateDocument}
