@@ -51,19 +51,6 @@ interface Document {
   teamId: number;
 }
 
-interface SidebarNavItemProps {
-  icon: LucideIcon;
-  label: string;
-  active?: boolean;
-  onClick?: () => void;
-}
-
-interface PinnedDocumentItemProps {
-  label: string;
-  active?: boolean;
-  onClick?: () => void;
-}
-
 interface DocumentIconProps {
   type?: DocumentIconType;
 }
@@ -215,31 +202,6 @@ const DocumentList = ({
               ))}
             </TableBody>
           </Table>
-
-          {/* Pagination */}
-          <div className="flex items-center justify-between mt-6 pt-6 border-t border-gray-200">
-            <div className="text-sm text-gray-600">
-              Showing <span className="font-medium">5</span> of{" "}
-              <span className="font-medium">128</span> documents
-            </div>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                disabled
-                className="text-gray-400"
-              >
-                Previous
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="text-gray-700 hover:bg-gray-50"
-              >
-                Next Page
-              </Button>
-            </div>
-          </div>
         </div>
       ) : (
         <EmptyDocumentList

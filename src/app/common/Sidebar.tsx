@@ -6,11 +6,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  Star,
   ChevronDown,
-  Settings,
   Users,
   FileText,
+  Clock,
   type LucideIcon,
 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
@@ -31,22 +30,22 @@ interface SidebarNavItemProps {
   onClick?: () => void;
 }
 
-interface PinnedDocumentItemProps {
+interface DocumentItemProps {
   label: string;
   active?: boolean;
   onClick?: () => void;
 }
 
-const PinnedDocumentItem: React.FC<PinnedDocumentItemProps> = ({
+const RecentDocumentItem: React.FC<DocumentItemProps> = ({
   label,
   active = false,
   onClick,
 }) => (
   <button
     onClick={onClick}
-    className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded transition-colors"
+    className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded transition-colors cursor-pointer"
   >
-    <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+    <Clock className="w-4 h-4 text-gray-400" />
     <span>{label}</span>
   </button>
 );
@@ -86,8 +85,6 @@ const Sidebar = () => {
       case "Team Members":
         navigate("/team");
         break;
-      case "Settings":
-        navigate("/settings");
         break;
       default:
         break;
@@ -125,10 +122,10 @@ const Sidebar = () => {
                 A
               </div>
               <div className="flex-1 text-left">
+                <div className="text-xs text-gray-500">CURRENT TEAM</div>
                 <div className="font-semibold text-gray-900">
-                  {user?.currentTeam?.name}
+                  {user?.currentTeam?.name ?? "No Team"}
                 </div>
-                <div className="text-xs text-gray-500">ENTERPRISE TEAM</div>
               </div>
               <ChevronDown className="w-4 h-4 text-gray-400" />
             </button>
@@ -140,7 +137,6 @@ const Sidebar = () => {
             <DropdownMenuItem onClick={() => setTeamCreateModalOpen(true)}>
               Create New Team
             </DropdownMenuItem>
-            <DropdownMenuItem>Team Settings</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
@@ -159,21 +155,15 @@ const Sidebar = () => {
           active={activeNav === "Team Members"}
           onClick={() => handleNavItemClick("Team Members")}
         />
-        <SidebarNavItem
-          icon={Settings}
-          label="Settings"
-          active={activeNav === "Settings"}
-          onClick={() => setActiveNav("Settings")}
-        />
 
         {/* Pinned Documents */}
         <div className="pt-6">
           <div className="px-4 pb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-            Pinned Documents
+            Recently Viewed
           </div>
           <div className="space-y-1">
-            <PinnedDocumentItem label="API Specifications" />
-            <PinnedDocumentItem label="Product Roadmap" />
+            <RecentDocumentItem label="API Specifications" />
+            <RecentDocumentItem label="Product Roadmap" />
           </div>
         </div>
       </nav>
