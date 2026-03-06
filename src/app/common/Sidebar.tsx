@@ -22,6 +22,7 @@ import apiClient from "@/lib/axios";
 import CreateTeamModal from "../components/CreateTeamModal";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { getNameInitials } from "@/lib/utils";
+import { Palette } from "lucide-react";
 
 interface SidebarNavItemProps {
   icon: LucideIcon;
@@ -74,6 +75,15 @@ const Sidebar = () => {
   const dispatch = useAppDispatch();
   const [teamSwitcherOpen, setTeamSwitcherOpen] = useState(false);
   const [teamCreateModalOpen, setTeamCreateModalOpen] = useState(false);
+  const [userColor, setUserColor] = useState<string>("#3b82f6");
+  const colorInputRef = React.useRef<HTMLInputElement>(null);
+
+  const presetColors = [
+    "#3b82f6", // blue
+    "#ef4444", // red
+    "#10b981", // green
+    "#f59e0b", // amber
+  ];
 
   const handleNavItemClick = (label: string) => {
     dispatch(setActiveNav(label));
@@ -109,6 +119,21 @@ const Sidebar = () => {
 
   const handleSignOut = () => {
     window.location.href = `${import.meta.env.VITE_API_BASE_URL}/auth/logout`;
+  };
+
+  const handleColorChange = (color: string) => {
+    setUserColor(color);
+    // Optional: Call API to save color preference
+    // apiClient.patch(`/users/${user?.id}`, { preferredColor: color });
+  };
+
+  const handleCustomColorClick = () => {
+    colorInputRef.current?.click();
+  };
+
+  const handleColorInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const color = e.target.value;
+    handleColorChange(color);
   };
 
   return (
@@ -197,6 +222,43 @@ const Sidebar = () => {
             <DropdownMenuItem onClick={handleSignOut}>
               Sign Out
             </DropdownMenuItem>
+            <div className="px-2 py-2 border-t border-gray-200">
+              <div className="flex items-center gap-2 mb-3">
+                <Palette className="w-4 h-4 text-gray-600" />
+                <span className="text-xs font-medium text-gray-600 uppercase tracking-wider">
+                  Profile Color
+                </span>
+              </div>
+              <div className="flex gap-2 items-center flex-wrap">
+                {presetColors.map((color) => (
+                  <button
+                    key={color}
+                    onClick={() => handleColorChange(color)}
+                    className={`w-7 h-7 rounded-full transition-transform hover:scale-110 ${
+                      userColor === color
+                        ? "ring-2 ring-offset-2 ring-gray-400"
+                        : "hover:scale-125"
+                    }`}
+                    style={{ backgroundColor: color }}
+                    title={color}
+                  />
+                ))}
+                <button
+                  onClick={handleCustomColorClick}
+                  className="w-7 h-7 rounded-full border-2 border-dashed border-gray-300 hover:border-gray-400 flex items-center justify-center text-xs font-bold text-gray-400 hover:text-gray-600 transition-colors"
+                  title="Custom color"
+                >
+                  +
+                </button>
+                <input
+                  ref={colorInputRef}
+                  type="color"
+                  value={userColor}
+                  onChange={handleColorInputChange}
+                  className="hidden"
+                />
+              </div>
+            </div>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
