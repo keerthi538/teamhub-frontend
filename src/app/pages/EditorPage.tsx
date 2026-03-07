@@ -187,7 +187,10 @@ const EditorPage = () => {
                     className="w-8 h-8 border-2 border-white ring-2 ring-slate-100 transition-transform hover:scale-110 hover:z-10"
                     title={collab.name}
                   >
-                    <AvatarFallback className="text-xs font-medium bg-gradient-to-br from-blue-500 to-violet-500 text-white">
+                    <AvatarFallback
+                      className="text-xs font-medium bg-gradient-to-br text-white"
+                      style={{ backgroundColor: collab.color }}
+                    >
                       {getNameInitials(collab.name)}
                     </AvatarFallback>
                   </Avatar>
@@ -217,7 +220,10 @@ const EditorPage = () => {
 
             {/* User Avatar */}
             <Avatar className="w-9 h-9 border-2 border-slate-200 shadow-sm">
-              <AvatarFallback className="bg-gradient-to-br from-emerald-500 to-teal-500 text-white font-medium">
+              <AvatarFallback
+                className="bg-gradient-to-br text-white font-medium"
+                style={{ backgroundColor: user?.profileColor }}
+              >
                 {getNameInitials(user.name)}
               </AvatarFallback>
             </Avatar>

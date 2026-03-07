@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import AddTeamMemberModal from "../components/AddTeamMemberModal";
 import type { Role, TeamMember } from "../types";
 import apiClient from "@/lib/axios";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { getNameInitials } from "@/lib/utils";
 
 const TeamMembers = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -180,11 +182,18 @@ const TeamMembers = () => {
                     >
                       <td className="px-6 py-5">
                         <div className="flex items-center gap-4">
-                          <div
-                            className={`w-11 h-11 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-md ring-2 ring-white`}
+                          <Avatar
+                            key={index}
+                            className="w-8 h-8 border-2 border-white ring-2 ring-slate-100 transition-transform hover:scale-110 hover:z-10"
+                            title={member.name}
                           >
-                            {/* {member.avatar} */}
-                          </div>
+                            <AvatarFallback
+                              className="text-xs font-medium bg-gradient-to-br text-white"
+                              style={{ backgroundColor: member.profileColor }}
+                            >
+                              {getNameInitials(member.name)}
+                            </AvatarFallback>
+                          </Avatar>
                           <div>
                             <div className="font-semibold text-slate-900 text-base">
                               {member.name}

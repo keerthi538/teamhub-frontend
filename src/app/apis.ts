@@ -5,7 +5,8 @@ export const getMe = async () => {
     withCredentials: true,
   });
 
-  const { id, name, email, memberships, currentTeam } = response.data;
+  const { id, name, email, memberships, currentTeam, profileColor } =
+    response.data;
   const teams = memberships.map((m: any) => m.team);
 
   return {
@@ -14,6 +15,7 @@ export const getMe = async () => {
     email,
     teams,
     currentTeam,
+    profileColor,
   };
 };
 

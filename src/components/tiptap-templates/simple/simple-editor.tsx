@@ -233,7 +233,6 @@ export function SimpleEditor({
     if (provider && currentUser) {
       // Set the awareness field for the current user
       provider.setAwarenessField("user", {
-        // Share any information you like
         id: +currentUser?.id,
         name: currentUser?.name,
         color: currentUser?.color,

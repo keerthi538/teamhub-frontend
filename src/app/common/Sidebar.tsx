@@ -77,12 +77,14 @@ const Sidebar = () => {
   const [teamCreateModalOpen, setTeamCreateModalOpen] = useState(false);
   const [userColor, setUserColor] = useState<string>("#3b82f6");
   const colorInputRef = React.useRef<HTMLInputElement>(null);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   const presetColors = [
     "#3b82f6", // blue
     "#ef4444", // red
     "#10b981", // green
     "#f59e0b", // amber
+    "#8b5cf6", // violet
   ];
 
   const handleNavItemClick = (label: string) => {
@@ -123,8 +125,15 @@ const Sidebar = () => {
 
   const handleColorChange = (color: string) => {
     setUserColor(color);
-    // Optional: Call API to save color preference
-    // apiClient.patch(`/users/${user?.id}`, { preferredColor: color });
+    apiClient
+      .patch("/users/profile-color", { profileColor: color })
+      .then(() => {
+        dispatch(fetchMe()); // Refresh user data to get updated profile color
+        setUserMenuOpen(false); // Close the user menu after selecting color
+      })
+      .catch((err) => {
+        console.error("Error updating profile color:", err);
+      });
   };
 
   const handleCustomColorClick = () => {
@@ -195,7 +204,7 @@ const Sidebar = () => {
 
       {/* User Profile */}
       <div className="p-4 border-t border-gray-200">
-        <DropdownMenu>
+        <DropdownMenu open={userMenuOpen} onOpenChange={setUserMenuOpen}>
           <DropdownMenuTrigger asChild>
             <button className="w-full flex items-center gap-3 hover:bg-gray-50 p-2 rounded-lg transition-colors">
               {/* profile icon */}
@@ -203,7 +212,10 @@ const Sidebar = () => {
                 className="w-8 h-8 border-2 border-white ring-2 ring-slate-100 transition-transform hover:scale-110 hover:z-10"
                 title={user?.name}
               >
-                <AvatarFallback className="text-xs font-medium bg-gradient-to-br from-blue-500 to-violet-500 text-white">
+                <AvatarFallback
+                  className={`text-xs font-medium bg-gradient-to-br text-white`}
+                  style={{ backgroundColor: user?.profileColor }}
+                >
                   {getNameInitials(user?.name || "")}
                 </AvatarFallback>
               </Avatar>
@@ -243,20 +255,6 @@ const Sidebar = () => {
                     title={color}
                   />
                 ))}
-                <button
-                  onClick={handleCustomColorClick}
-                  className="w-7 h-7 rounded-full border-2 border-dashed border-gray-300 hover:border-gray-400 flex items-center justify-center text-xs font-bold text-gray-400 hover:text-gray-600 transition-colors"
-                  title="Custom color"
-                >
-                  +
-                </button>
-                <input
-                  ref={colorInputRef}
-                  type="color"
-                  value={userColor}
-                  onChange={handleColorInputChange}
-                  className="hidden"
-                />
               </div>
             </div>
           </DropdownMenuContent>
