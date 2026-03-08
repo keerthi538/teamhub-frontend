@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Share2, FileText, Check, Loader2 } from "lucide-react";
+import { FileText, Check, Loader2, Upload } from "lucide-react";
 import { SimpleEditor } from "@/components/tiptap-templates/simple/simple-editor";
 import { useNavigate, useParams } from "react-router-dom";
 import { debounce, getNameInitials } from "@/lib/utils";
@@ -24,6 +24,7 @@ const EditorPage = () => {
   const [currentUser, setCurrentUser] = useState(null);
   const [isSavingTitle, setIsSavingTitle] = useState(false);
   const [titleSaved, setTitleSaved] = useState(false);
+  const [isDocPublished, setIsDocPublished] = useState(false);
   const titleInputRef = useRef<HTMLInputElement>(null);
   const user = useAppSelector(selectUser);
 
@@ -65,6 +66,7 @@ const EditorPage = () => {
         const doc = docResponse.data;
         const { token, user } = tokenResponse.data;
 
+        setIsDocPublished(doc.published);
         setTitle(doc.title);
         setCollabToken(token);
         setCurrentUser(user);
@@ -79,9 +81,20 @@ const EditorPage = () => {
     fetchDocumentAndToken();
   }, [documentId]);
 
-  const handleTitleChange = async (newTitle: string) => {
-    console.log("Handletitle change", newTitle);
+  const handleDocumentPublish = async () => {
+    try {
+      await apiClient.patch(
+        `/documents/${documentId}/publish`,
+        {},
+        { withCredentials: true },
+      );
+      setIsDocPublished(true);
+    } catch (error) {
+      console.error("Error publishing document:", error);
+    }
+  };
 
+  const handleTitleChange = async (newTitle: string) => {
     try {
       setIsSavingTitle(true);
       setTitleSaved(false);
@@ -105,7 +118,10 @@ const EditorPage = () => {
     }
   };
 
-  const debouncedTitleChange = debounce(handleTitleChange, 1000);
+  const debouncedTitleChange = useMemo(
+    () => debounce(handleTitleChange, 1000),
+    [],
+  );
 
   const handleTitleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
@@ -144,7 +160,6 @@ const EditorPage = () => {
                 type="text"
                 value={title}
                 onChange={(event) => {
-                  console.log("Change");
                   setTitle(event.target.value);
                   debouncedTitleChange(event.target.value);
                 }}
@@ -172,7 +187,10 @@ const EditorPage = () => {
                     className="w-8 h-8 border-2 border-white ring-2 ring-slate-100 transition-transform hover:scale-110 hover:z-10"
                     title={collab.name}
                   >
-                    <AvatarFallback className="text-xs font-medium bg-gradient-to-br from-blue-500 to-violet-500 text-white">
+                    <AvatarFallback
+                      className="text-xs font-medium bg-gradient-to-br text-white"
+                      style={{ backgroundColor: collab.color }}
+                    >
                       {getNameInitials(collab.name)}
                     </AvatarFallback>
                   </Avatar>
@@ -189,15 +207,23 @@ const EditorPage = () => {
               </div>
             </div>
 
-            {/* Share Button */}
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-600/20 transition-all duration-200 hover:shadow-lg hover:shadow-blue-600/30 font-medium">
-              <Share2 className="w-4 h-4 mr-2" />
-              Share
+            {/* Publish Button */}
+
+            <Button
+              onClick={handleDocumentPublish}
+              disabled={isDocPublished}
+              className="bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-600/20 transition-all duration-200 hover:shadow-lg hover:shadow-blue-600/30 font-medium"
+            >
+              <Upload className="w-4 h-4 mr-2" />
+              {isDocPublished ? "Published" : "Publish"}
             </Button>
 
             {/* User Avatar */}
             <Avatar className="w-9 h-9 border-2 border-slate-200 shadow-sm">
-              <AvatarFallback className="bg-gradient-to-br from-emerald-500 to-teal-500 text-white font-medium">
+              <AvatarFallback
+                className="bg-gradient-to-br text-white font-medium"
+                style={{ backgroundColor: user?.profileColor }}
+              >
                 {getNameInitials(user.name)}
               </AvatarFallback>
             </Avatar>

@@ -6,11 +6,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  Star,
   ChevronDown,
-  Settings,
   Users,
   FileText,
+  Clock,
   type LucideIcon,
 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
@@ -23,6 +22,7 @@ import apiClient from "@/lib/axios";
 import CreateTeamModal from "../components/CreateTeamModal";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { getNameInitials } from "@/lib/utils";
+import { Palette } from "lucide-react";
 
 interface SidebarNavItemProps {
   icon: LucideIcon;
@@ -31,22 +31,22 @@ interface SidebarNavItemProps {
   onClick?: () => void;
 }
 
-interface PinnedDocumentItemProps {
+interface DocumentItemProps {
   label: string;
   active?: boolean;
   onClick?: () => void;
 }
 
-const PinnedDocumentItem: React.FC<PinnedDocumentItemProps> = ({
+const RecentDocumentItem: React.FC<DocumentItemProps> = ({
   label,
   active = false,
   onClick,
 }) => (
   <button
     onClick={onClick}
-    className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded transition-colors"
+    className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded transition-colors cursor-pointer"
   >
-    <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+    <Clock className="w-4 h-4 text-gray-400" />
     <span>{label}</span>
   </button>
 );
@@ -75,6 +75,17 @@ const Sidebar = () => {
   const dispatch = useAppDispatch();
   const [teamSwitcherOpen, setTeamSwitcherOpen] = useState(false);
   const [teamCreateModalOpen, setTeamCreateModalOpen] = useState(false);
+  const [userColor, setUserColor] = useState<string>("#3b82f6");
+  const colorInputRef = React.useRef<HTMLInputElement>(null);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+
+  const presetColors = [
+    "#3b82f6", // blue
+    "#ef4444", // red
+    "#10b981", // green
+    "#f59e0b", // amber
+    "#8b5cf6", // violet
+  ];
 
   const handleNavItemClick = (label: string) => {
     dispatch(setActiveNav(label));
@@ -86,8 +97,6 @@ const Sidebar = () => {
       case "Team Members":
         navigate("/team");
         break;
-      case "Settings":
-        navigate("/settings");
         break;
       default:
         break;
@@ -114,6 +123,28 @@ const Sidebar = () => {
     window.location.href = `${import.meta.env.VITE_API_BASE_URL}/auth/logout`;
   };
 
+  const handleColorChange = (color: string) => {
+    setUserColor(color);
+    apiClient
+      .patch("/users/profile-color", { profileColor: color })
+      .then(() => {
+        dispatch(fetchMe()); // Refresh user data to get updated profile color
+        setUserMenuOpen(false); // Close the user menu after selecting color
+      })
+      .catch((err) => {
+        console.error("Error updating profile color:", err);
+      });
+  };
+
+  const handleCustomColorClick = () => {
+    colorInputRef.current?.click();
+  };
+
+  const handleColorInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const color = e.target.value;
+    handleColorChange(color);
+  };
+
   return (
     <aside className="w-64 border-r border-gray-200 flex flex-col">
       {/* Company Header */}
@@ -125,10 +156,10 @@ const Sidebar = () => {
                 A
               </div>
               <div className="flex-1 text-left">
+                <div className="text-xs text-gray-500">CURRENT TEAM</div>
                 <div className="font-semibold text-gray-900">
-                  {user?.currentTeam?.name}
+                  {user?.currentTeam?.name ?? "No Team"}
                 </div>
-                <div className="text-xs text-gray-500">ENTERPRISE TEAM</div>
               </div>
               <ChevronDown className="w-4 h-4 text-gray-400" />
             </button>
@@ -140,7 +171,6 @@ const Sidebar = () => {
             <DropdownMenuItem onClick={() => setTeamCreateModalOpen(true)}>
               Create New Team
             </DropdownMenuItem>
-            <DropdownMenuItem>Team Settings</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
@@ -159,28 +189,22 @@ const Sidebar = () => {
           active={activeNav === "Team Members"}
           onClick={() => handleNavItemClick("Team Members")}
         />
-        <SidebarNavItem
-          icon={Settings}
-          label="Settings"
-          active={activeNav === "Settings"}
-          onClick={() => setActiveNav("Settings")}
-        />
 
         {/* Pinned Documents */}
         <div className="pt-6">
           <div className="px-4 pb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-            Pinned Documents
+            Recently Viewed
           </div>
           <div className="space-y-1">
-            <PinnedDocumentItem label="API Specifications" />
-            <PinnedDocumentItem label="Product Roadmap" />
+            <RecentDocumentItem label="API Specifications" />
+            <RecentDocumentItem label="Product Roadmap" />
           </div>
         </div>
       </nav>
 
       {/* User Profile */}
       <div className="p-4 border-t border-gray-200">
-        <DropdownMenu>
+        <DropdownMenu open={userMenuOpen} onOpenChange={setUserMenuOpen}>
           <DropdownMenuTrigger asChild>
             <button className="w-full flex items-center gap-3 hover:bg-gray-50 p-2 rounded-lg transition-colors">
               {/* profile icon */}
@@ -188,7 +212,10 @@ const Sidebar = () => {
                 className="w-8 h-8 border-2 border-white ring-2 ring-slate-100 transition-transform hover:scale-110 hover:z-10"
                 title={user?.name}
               >
-                <AvatarFallback className="text-xs font-medium bg-gradient-to-br from-blue-500 to-violet-500 text-white">
+                <AvatarFallback
+                  className={`text-xs font-medium bg-gradient-to-br text-white`}
+                  style={{ backgroundColor: user?.profileColor }}
+                >
                   {getNameInitials(user?.name || "")}
                 </AvatarFallback>
               </Avatar>
@@ -207,6 +234,29 @@ const Sidebar = () => {
             <DropdownMenuItem onClick={handleSignOut}>
               Sign Out
             </DropdownMenuItem>
+            <div className="px-2 py-2 border-t border-gray-200">
+              <div className="flex items-center gap-2 mb-3">
+                <Palette className="w-4 h-4 text-gray-600" />
+                <span className="text-xs font-medium text-gray-600 uppercase tracking-wider">
+                  Profile Color
+                </span>
+              </div>
+              <div className="flex gap-2 items-center flex-wrap">
+                {presetColors.map((color) => (
+                  <button
+                    key={color}
+                    onClick={() => handleColorChange(color)}
+                    className={`w-7 h-7 rounded-full transition-transform hover:scale-110 ${
+                      userColor === color
+                        ? "ring-2 ring-offset-2 ring-gray-400"
+                        : "hover:scale-125"
+                    }`}
+                    style={{ backgroundColor: color }}
+                    title={color}
+                  />
+                ))}
+              </div>
+            </div>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

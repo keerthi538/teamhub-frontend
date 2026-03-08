@@ -23,6 +23,7 @@ export type TeamMember = {
   name: string;
   email: string;
   role: Role;
+  profileColor?: string;
 };
 
 export type Collaborator = {

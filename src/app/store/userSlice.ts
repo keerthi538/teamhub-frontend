@@ -23,6 +23,7 @@ interface UserState {
   status?: "idle" | "loading" | "succeeded" | "failed";
   error?: string | null;
   isAuthenticated?: boolean;
+  profileColor?: string;
 }
 
 // Define the initial state using that type
@@ -35,6 +36,7 @@ const initialState: UserState = {
   status: "idle",
   error: null,
   isAuthenticated: false,
+  profileColor: "#3b82f6", // Default profile color
 };
 
 export const userSlice = createSlice({
@@ -47,7 +49,6 @@ export const userSlice = createSlice({
         state.status = "loading";
       })
       .addCase(fetchMe.fulfilled, (state, action) => {
-        console.log("Fetched user:", action.payload);
         state.status = "succeeded";
         state.id = action.payload.id;
         state.email = action.payload.email;
@@ -55,6 +56,7 @@ export const userSlice = createSlice({
         state.teams = action.payload.teams;
         state.currentTeam = action.payload.currentTeam;
         state.isAuthenticated = true;
+        state.profileColor = action.payload.profileColor || state.profileColor; // Update profile color if provided
       })
       .addCase(fetchMe.rejected, (state, action) => {
         state.status = "failed";

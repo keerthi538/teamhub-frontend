@@ -13,7 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getNameInitials } from "@/lib/utils";
+import { getNameInitials, timeAgo } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Star,
@@ -28,6 +28,7 @@ import type { LucideIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import EmptyDocumentList from "./EmptyDocumentList";
 import { Team } from "../types";
+import { useEffect, useState } from "react";
 
 // Type Definitions
 type DocumentStatus = "PUBLISHED" | "DRAFT" | "INTERNAL";
@@ -48,19 +49,6 @@ interface Document {
   status: DocumentStatus;
   iconType: DocumentIconType;
   teamId: number;
-}
-
-interface SidebarNavItemProps {
-  icon: LucideIcon;
-  label: string;
-  active?: boolean;
-  onClick?: () => void;
-}
-
-interface PinnedDocumentItemProps {
-  label: string;
-  active?: boolean;
-  onClick?: () => void;
 }
 
 interface DocumentIconProps {
@@ -130,6 +118,16 @@ const DocumentList = ({
   currentTeam: Team | null;
   handleCreateDocument: () => void;
 }) => {
+  const [now, setNow] = useState(Date.now());
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setNow(Date.now());
+    }, 60000); // Update every minute
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <>
       {documents.length > 0 ? (
@@ -195,7 +193,7 @@ const DocumentList = ({
                     </div>
                   </TableCell>
                   <TableCell className="text-gray-600">
-                    {doc.lastEdited}
+                    {timeAgo(doc.lastEdited, now)}
                   </TableCell>
                   <TableCell>
                     <StatusBadge status={doc.status} />
@@ -204,31 +202,6 @@ const DocumentList = ({
               ))}
             </TableBody>
           </Table>
-
-          {/* Pagination */}
-          <div className="flex items-center justify-between mt-6 pt-6 border-t border-gray-200">
-            <div className="text-sm text-gray-600">
-              Showing <span className="font-medium">5</span> of{" "}
-              <span className="font-medium">128</span> documents
-            </div>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                disabled
-                className="text-gray-400"
-              >
-                Previous
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="text-gray-700 hover:bg-gray-50"
-              >
-                Next Page
-              </Button>
-            </div>
-          </div>
         </div>
       ) : (
         <EmptyDocumentList
