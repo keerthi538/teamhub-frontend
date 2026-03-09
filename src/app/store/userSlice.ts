@@ -24,6 +24,7 @@ interface UserState {
   error?: string | null;
   isAuthenticated?: boolean;
   profileColor?: string;
+  currentTeamRole?: string; // Add currentTeamRole to the state
 }
 
 // Define the initial state using that type
@@ -37,6 +38,7 @@ const initialState: UserState = {
   error: null,
   isAuthenticated: false,
   profileColor: "#3b82f6", // Default profile color
+  currentTeamRole: "", // Initialize currentTeamRole
 };
 
 export const userSlice = createSlice({
@@ -56,7 +58,8 @@ export const userSlice = createSlice({
         state.teams = action.payload.teams;
         state.currentTeam = action.payload.currentTeam;
         state.isAuthenticated = true;
-        state.profileColor = action.payload.profileColor || state.profileColor; // Update profile color if provided
+        state.profileColor = action.payload.profileColor || state.profileColor;
+        state.currentTeamRole = action.payload.currentTeamRole || "";
       })
       .addCase(fetchMe.rejected, (state, action) => {
         state.status = "failed";
