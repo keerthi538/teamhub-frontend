@@ -1,22 +1,23 @@
 import { Button } from "@/components/ui/button";
 import apiClient from "@/lib/axios";
 import { useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 
-export default function Login() {
+export default function SignUp() {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const navigate = useNavigate();
 
-  const handleSignin = () => {
+  const handleSignup = () => {
     apiClient
-      .post("/auth/signin", { email, password })
+      .post("/auth/signup", { name, email, password })
       .then((response) => {
         navigate("/");
       })
       .catch((error) => {
-        console.error("Signin failed:", error);
+        console.error("Signup failed:", error);
       });
   };
 
@@ -31,14 +32,14 @@ export default function Login() {
         {/* Header */}
         <div className="mb-6 text-center">
           <h1 className="text-2xl font-semibold text-[#0b1220]">
-            Welcome back
+            Create an account
           </h1>
           <p className="mt-1 text-sm text-[#5b6b8a]">
-            Sign in to continue to TeamHub
+            Sign up to get started with TeamHub
           </p>
         </div>
 
-        {/* Google login */}
+        {/* Google sign up */}
         <button
           onClick={() => {
             window.location.href =
@@ -61,8 +62,21 @@ export default function Login() {
           <div className="h-px flex-1 bg-[#e6ebf5]" />
         </div>
 
-        {/* Email / password (placeholder) */}
+        {/* Name / Email / Password */}
         <div className="space-y-4">
+          <div>
+            <label className="mb-1 block text-sm font-medium text-[#0b1220]">
+              Full name
+            </label>
+            <input
+              type="text"
+              placeholder="Jane Smith"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full rounded-lg border border-[#e6ebf5] px-3 py-2 text-sm text-[#0b1220] placeholder:text-[#8a97b3] focus:border-[#4f7cff] focus:outline-none focus:ring-2 focus:ring-[#4f7cff]/30"
+            />
+          </div>
+
           <div>
             <label className="mb-1 block text-sm font-medium text-[#0b1220]">
               Email address
@@ -90,27 +104,27 @@ export default function Login() {
           </div>
 
           <Button
-            disabled={email === "" || password === ""}
+            disabled={name === "" || email === "" || password === ""}
             className="w-full"
             style={{
               backgroundColor: "#155DFC",
               cursor: "pointer",
             }}
-            onClick={handleSignin}
+            onClick={handleSignup}
           >
-            Sign in
+            Create account
           </Button>
         </div>
 
         {/* Footer */}
         <div className="mt-6 text-center text-sm text-[#5b6b8a]">
-          Don't have an account ?
+          Already have an account?{" "}
           <Button
             variant="link"
             style={{ color: "#155DFC", cursor: "pointer" }}
-            onClick={() => navigate("/signup")}
+            onClick={() => navigate("/signin")}
           >
-            Sign up
+            Sign in
           </Button>
         </div>
       </div>
