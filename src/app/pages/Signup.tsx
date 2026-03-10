@@ -1,14 +1,23 @@
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import apiClient from "@/lib/axios";
-import { useState } from "react";
+import { AlertCircleIcon } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function SignUp() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [errorDetails, setErrorDetails] = useState([]);
 
   const navigate = useNavigate();
+
+  const clearError = () => {
+    setError("");
+    setErrorDetails([]);
+  };
 
   const handleSignup = () => {
     apiClient
@@ -16,10 +25,20 @@ export default function SignUp() {
       .then((response) => {
         navigate("/");
       })
-      .catch((error) => {
-        console.error("Signup failed:", error);
+      .catch((err) => {
+        const errorResponse = err.response?.data;
+
+        setError(errorResponse?.error ?? "Sign up failed");
+        setErrorDetails(errorResponse?.details ?? []);
       });
   };
+
+  useEffect(() => {
+    setError("");
+    setName("");
+    setEmail("");
+    setPassword("");
+  }, []);
 
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-b from-[#c3cef6] to-white px-4">
@@ -72,7 +91,10 @@ export default function SignUp() {
               type="text"
               placeholder="Jane Smith"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => {
+                setName(e.target.value);
+                clearError();
+              }}
               className="w-full rounded-lg border border-[#e6ebf5] px-3 py-2 text-sm text-[#0b1220] placeholder:text-[#8a97b3] focus:border-[#4f7cff] focus:outline-none focus:ring-2 focus:ring-[#4f7cff]/30"
             />
           </div>
@@ -85,7 +107,10 @@ export default function SignUp() {
               type="email"
               placeholder="you@example.com"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                clearError();
+              }}
               className="w-full rounded-lg border border-[#e6ebf5] px-3 py-2 text-sm text-[#0b1220] placeholder:text-[#8a97b3] focus:border-[#4f7cff] focus:outline-none focus:ring-2 focus:ring-[#4f7cff]/30"
             />
           </div>
@@ -98,7 +123,10 @@ export default function SignUp() {
               type="password"
               placeholder="••••••••"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                clearError();
+              }}
               className="w-full rounded-lg border border-[#e6ebf5] px-3 py-2 text-sm text-[#0b1220] placeholder:text-[#8a97b3] focus:border-[#4f7cff] focus:outline-none focus:ring-2 focus:ring-[#4f7cff]/30"
             />
           </div>
@@ -114,6 +142,22 @@ export default function SignUp() {
           >
             Create account
           </Button>
+
+          {error.length > 0 && (
+            <Alert variant="destructive" className="max-w-md">
+              <AlertCircleIcon />
+              <AlertTitle>{error}</AlertTitle>
+              <AlertDescription>
+                {errorDetails.length > 0 && (
+                  <ul className="mt-2 list-disc pl-5 text-sm">
+                    {errorDetails.map((detail, index) => (
+                      <li key={index}>{detail}</li>
+                    ))}
+                  </ul>
+                )}
+              </AlertDescription>
+            </Alert>
+          )}
         </div>
 
         {/* Footer */}

@@ -1,11 +1,14 @@
+import { Alert, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import apiClient from "@/lib/axios";
+import { AlertCircleIcon } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const navigate = useNavigate();
 
@@ -16,7 +19,9 @@ export default function Login() {
         navigate("/");
       })
       .catch((error) => {
-        console.error("Signin failed:", error);
+        setError(
+          error.response?.data?.error || "Failed to sign in. Please try again.",
+        );
       });
   };
 
@@ -71,7 +76,10 @@ export default function Login() {
               type="email"
               placeholder="you@example.com"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                setError("");
+              }}
               className="w-full rounded-lg border border-[#e6ebf5] px-3 py-2 text-sm text-[#0b1220] placeholder:text-[#8a97b3] focus:border-[#4f7cff] focus:outline-none focus:ring-2 focus:ring-[#4f7cff]/30"
             />
           </div>
@@ -84,7 +92,10 @@ export default function Login() {
               type="password"
               placeholder="••••••••"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                setError("");
+              }}
               className="w-full rounded-lg border border-[#e6ebf5] px-3 py-2 text-sm text-[#0b1220] placeholder:text-[#8a97b3] focus:border-[#4f7cff] focus:outline-none focus:ring-2 focus:ring-[#4f7cff]/30"
             />
           </div>
@@ -100,6 +111,13 @@ export default function Login() {
           >
             Sign in
           </Button>
+
+          {error.length > 0 && (
+            <Alert variant="destructive" className="max-w-md">
+              <AlertCircleIcon />
+              <AlertTitle>{error}</AlertTitle>
+            </Alert>
+          )}
         </div>
 
         {/* Footer */}
