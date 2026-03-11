@@ -33,6 +33,11 @@ export default function SignUp() {
       });
   };
 
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    handleSignup();
+  };
+
   useEffect(() => {
     setError("");
     setName("");
@@ -82,7 +87,7 @@ export default function SignUp() {
         </div>
 
         {/* Name / Email / Password */}
-        <div className="space-y-4">
+        <form onSubmit={handleFormSubmit} className="space-y-4">
           <div>
             <label className="mb-1 block text-sm font-medium text-[#0b1220]">
               Full name
@@ -133,12 +138,12 @@ export default function SignUp() {
 
           <Button
             disabled={name === "" || email === "" || password === ""}
+            type="submit"
             className="w-full"
             style={{
               backgroundColor: "#155DFC",
               cursor: "pointer",
             }}
-            onClick={handleSignup}
           >
             Create account
           </Button>
@@ -146,8 +151,9 @@ export default function SignUp() {
           {error.length > 0 && (
             <Alert variant="destructive" className="max-w-md">
               <AlertCircleIcon />
-              <AlertTitle>{error}</AlertTitle>
+              <AlertTitle>Error</AlertTitle>
               <AlertDescription>
+                {error}
                 {errorDetails.length > 0 && (
                   <ul className="mt-2 list-disc pl-5 text-sm">
                     {errorDetails.map((detail, index) => (
@@ -158,19 +164,19 @@ export default function SignUp() {
               </AlertDescription>
             </Alert>
           )}
-        </div>
 
-        {/* Footer */}
-        <div className="mt-6 text-center text-sm text-[#5b6b8a]">
-          Already have an account?{" "}
-          <Button
-            variant="link"
-            style={{ color: "#155DFC", cursor: "pointer" }}
-            onClick={() => navigate("/signin")}
-          >
-            Sign in
-          </Button>
-        </div>
+          {/* Footer */}
+          <div className="text-center text-sm text-[#5b6b8a]">
+            Already have an account?{" "}
+            <Button
+              variant="link"
+              style={{ color: "#155DFC", cursor: "pointer" }}
+              onClick={() => navigate("/signin")}
+            >
+              Sign in
+            </Button>
+          </div>
+        </form>
       </div>
     </div>
   );

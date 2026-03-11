@@ -1,4 +1,4 @@
-import { Alert, AlertTitle } from "@/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import apiClient from "@/lib/axios";
 import { AlertCircleIcon } from "lucide-react";
@@ -23,6 +23,11 @@ export default function Login() {
           error.response?.data?.error || "Failed to sign in. Please try again.",
         );
       });
+  };
+
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    handleSignin();
   };
 
   return (
@@ -67,7 +72,7 @@ export default function Login() {
         </div>
 
         {/* Email / password (placeholder) */}
-        <div className="space-y-4">
+        <form onSubmit={handleFormSubmit} className="space-y-4">
           <div>
             <label className="mb-1 block text-sm font-medium text-[#0b1220]">
               Email address
@@ -115,22 +120,25 @@ export default function Login() {
           {error.length > 0 && (
             <Alert variant="destructive" className="max-w-md">
               <AlertCircleIcon />
-              <AlertTitle>{error}</AlertTitle>
+              <AlertTitle>Error</AlertTitle>
+              <AlertDescription className="break-words whitespace-normal">
+                {error}
+              </AlertDescription>
             </Alert>
           )}
-        </div>
 
-        {/* Footer */}
-        <div className="mt-6 text-center text-sm text-[#5b6b8a]">
-          Don't have an account ?
-          <Button
-            variant="link"
-            style={{ color: "#155DFC", cursor: "pointer" }}
-            onClick={() => navigate("/signup")}
-          >
-            Sign up
-          </Button>
-        </div>
+          <div className="mt-6 text-center text-sm text-[#5b6b8a]">
+            Don't have an account ?
+            <Button
+              variant="link"
+              style={{ color: "#155DFC", cursor: "pointer" }}
+              onClick={() => navigate("/signup")}
+            >
+              Sign up
+            </Button>
+          </div>
+        </form>
+
       </div>
     </div>
   );
