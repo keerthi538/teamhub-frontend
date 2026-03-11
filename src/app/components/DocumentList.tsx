@@ -29,6 +29,7 @@ import { Badge } from "@/components/ui/badge";
 import EmptyDocumentList from "./EmptyDocumentList";
 import { Team } from "../types";
 import { useEffect, useState } from "react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 // Type Definitions
 type DocumentStatus = "PUBLISHED" | "DRAFT" | "INTERNAL";
@@ -37,7 +38,7 @@ type DocumentIconType = "default" | "presentation" | "guide" | "database";
 interface Author {
   initials: string;
   name: string;
-  color: string;
+  profileColor: string;
 }
 
 interface Document {
@@ -185,10 +186,17 @@ const DocumentList = ({
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <AuthorAvatar
-                        initials={getNameInitials(doc.author.name)}
-                        color={doc.author.color ?? "bg-gray-400"}
-                      />
+                      <Avatar
+                        className="w-8 h-8 border-2 border-white ring-2 ring-slate-100 transition-transform hover:scale-110 hover:z-10"
+                        title={doc.author?.name}
+                      >
+                        <AvatarFallback
+                          className={`text-xs font-medium bg-gradient-to-br text-white`}
+                          style={{ backgroundColor: doc.author?.profileColor }}
+                        >
+                          {getNameInitials(doc.author?.name || "")}
+                        </AvatarFallback>
+                      </Avatar>
                       <span className="text-gray-700">{doc.author.name}</span>
                     </div>
                   </TableCell>
