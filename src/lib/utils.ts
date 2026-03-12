@@ -28,7 +28,7 @@ export function debounce(fn, timeout = 300) {
   };
 }
 
-export function timeAgo(dateString: string, now: number): string {
+export function timeAgo(dateString: string | Date, now: number): string {
   const date = new Date(dateString);
   const diffInSeconds = Math.floor((now - date.getTime()) / 1000);
 

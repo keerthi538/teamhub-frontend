@@ -4,7 +4,7 @@ import type { Role, TeamMember } from "../types";
 import apiClient from "@/lib/axios";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { getNameInitials } from "@/lib/utils";
+import { getNameInitials, timeAgo } from "@/lib/utils";
 import { useAppSelector } from "../store/hooks";
 import { selectUser } from "../store/userSlice";
 import { USER_ROLES } from "@/constants";
@@ -15,6 +15,16 @@ const TeamMembers = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const currentUser = useAppSelector(selectUser);
+
+  const [now, setNow] = useState(Date.now());
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setNow(Date.now());
+    }, 60000); // Update every minute
+
+    return () => clearInterval(interval);
+  }, []);
 
   const filteredMembers = teamMembers.filter((member) => {
     const query = searchQuery.toLowerCase();
@@ -191,7 +201,7 @@ const TeamMembers = () => {
                       </td>
                       <td className="px-6 py-5">
                         <span className="text-sm text-slate-600 font-medium">
-                          {/* {member.lastActive} */}--
+                          {timeAgo(member.lastActive, now)}
                         </span>
                       </td>
                       <td className="px-6 py-5">

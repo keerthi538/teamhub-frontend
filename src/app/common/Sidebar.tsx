@@ -158,7 +158,7 @@ const Sidebar = () => {
           <DropdownMenuTrigger asChild>
             <button className="w-full flex items-center gap-3 hover:bg-gray-50 p-2 rounded-lg transition-colors">
               <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-lg">
-                A
+                {user?.currentTeam?.name.charAt(0).toUpperCase() ?? "T"}
               </div>
               <div className="flex-1 text-left">
                 <div className="text-xs text-gray-500">CURRENT TEAM</div>
@@ -211,9 +211,7 @@ const Sidebar = () => {
                   key={doc.uuid}
                   label={doc.title}
                   onClick={() =>
-                    navigate(
-                      `/teams/${doc.teamId}/documents/${doc.uuid}`,
-                    )
+                    navigate(`/teams/${doc.teamId}/documents/${doc.uuid}`)
                   }
                 />
               ))
