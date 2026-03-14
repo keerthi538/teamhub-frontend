@@ -38,7 +38,7 @@ type DocumentIconType = "default" | "presentation" | "guide" | "database";
 interface Author {
   initials: string;
   name: string;
-  profileColor: string;
+  profileColor?: string;
 }
 
 interface Document {
