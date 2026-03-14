@@ -16,7 +16,8 @@ export default function App() {
 
   useEffect(() => {
     const handleUnauthorized = () => {
-      navigate("/login", { replace: true });
+      if (location.pathname === "/signin") return; // Already on signin page, no need to navigate
+      navigate("/signin", { replace: true });
     };
 
     window.addEventListener("auth:unauthorized", handleUnauthorized);

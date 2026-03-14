@@ -12,7 +12,7 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Note: This event is handled in App.tsx -> it navigate the page to /login
+      // Note: This event is handled in App.tsx -> it navigate the page to /signin
       window.dispatchEvent(new CustomEvent("auth:unauthorized"));
     }
     return Promise.reject(error);

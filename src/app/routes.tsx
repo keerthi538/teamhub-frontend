@@ -4,11 +4,16 @@ import ProtectedRoute from "./ProtectedRoute";
 import AppLayout from "./common/AppLayout";
 import TeamMembers from "./pages/TeamMembers";
 import EditorPage from "./pages/EditorPage";
+import SignUp from "./pages/Signup";
 
 export const routes = [
   {
-    path: "/login",
+    path: "/signin",
     element: <Login />,
+  },
+  {
+    path: "/signup",
+    element: <SignUp />,
   },
   {
     path: "/",

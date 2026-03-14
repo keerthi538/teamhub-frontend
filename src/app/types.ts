@@ -24,6 +24,7 @@ export type TeamMember = {
   email: string;
   role: Role;
   profileColor?: string;
+  lastActive?: Date;
 };
 
 export type Collaborator = {

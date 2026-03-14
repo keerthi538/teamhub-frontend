@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -78,6 +78,9 @@ const Sidebar = () => {
   const [userColor, setUserColor] = useState<string>("#3b82f6");
   const colorInputRef = React.useRef<HTMLInputElement>(null);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [recentDocuments, setRecentDocuments] = useState<
+    { uuid: string; title: string; teamId: number }[]
+  >([]);
 
   const presetColors = [
     "#3b82f6", // blue
@@ -136,14 +139,16 @@ const Sidebar = () => {
       });
   };
 
-  const handleCustomColorClick = () => {
-    colorInputRef.current?.click();
-  };
-
-  const handleColorInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const color = e.target.value;
-    handleColorChange(color);
-  };
+  useEffect(() => {
+    apiClient
+      .get("/documents/recent")
+      .then((response) => {
+        setRecentDocuments(response.data);
+      })
+      .catch((err) => {
+        console.error("Error fetching recent documents:", err);
+      });
+  }, []);
 
   return (
     <aside className="w-64 border-r border-gray-200 flex flex-col">
@@ -153,7 +158,7 @@ const Sidebar = () => {
           <DropdownMenuTrigger asChild>
             <button className="w-full flex items-center gap-3 hover:bg-gray-50 p-2 rounded-lg transition-colors">
               <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-lg">
-                A
+                {user?.currentTeam?.name.charAt(0).toUpperCase() ?? "T"}
               </div>
               <div className="flex-1 text-left">
                 <div className="text-xs text-gray-500">CURRENT TEAM</div>
@@ -196,8 +201,21 @@ const Sidebar = () => {
             Recently Viewed
           </div>
           <div className="space-y-1">
-            <RecentDocumentItem label="API Specifications" />
-            <RecentDocumentItem label="Product Roadmap" />
+            {recentDocuments.length === 0 ? (
+              <div className="px-4 py-2 text-sm text-gray-500">
+                No recent documents
+              </div>
+            ) : (
+              recentDocuments.map((doc) => (
+                <RecentDocumentItem
+                  key={doc.uuid}
+                  label={doc.title}
+                  onClick={() =>
+                    navigate(`/teams/${doc.teamId}/documents/${doc.uuid}`)
+                  }
+                />
+              ))
+            )}
           </div>
         </div>
       </nav>

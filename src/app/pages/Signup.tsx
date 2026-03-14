@@ -2,33 +2,48 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import apiClient from "@/lib/axios";
 import { AlertCircleIcon } from "lucide-react";
-import { useState } from "react";
-import { useNavigate } from "react-router";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-export default function Login() {
+export default function SignUp() {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [errorDetails, setErrorDetails] = useState([]);
 
   const navigate = useNavigate();
 
-  const handleSignin = () => {
+  const clearError = () => {
+    setError("");
+    setErrorDetails([]);
+  };
+
+  const handleSignup = () => {
     apiClient
-      .post("/auth/signin", { email, password })
+      .post("/auth/signup", { name, email, password })
       .then((response) => {
         navigate("/");
       })
-      .catch((error) => {
-        setError(
-          error.response?.data?.error || "Failed to sign in. Please try again.",
-        );
+      .catch((err) => {
+        const errorResponse = err.response?.data;
+
+        setError(errorResponse?.error ?? "Sign up failed");
+        setErrorDetails(errorResponse?.details ?? []);
       });
   };
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    handleSignin();
+    handleSignup();
   };
+
+  useEffect(() => {
+    setError("");
+    setName("");
+    setEmail("");
+    setPassword("");
+  }, []);
 
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-b from-[#c3cef6] to-white px-4">
@@ -41,14 +56,14 @@ export default function Login() {
         {/* Header */}
         <div className="mb-6 text-center">
           <h1 className="text-2xl font-semibold text-[#0b1220]">
-            Welcome back
+            Create an account
           </h1>
           <p className="mt-1 text-sm text-[#5b6b8a]">
-            Sign in to continue to TeamHub
+            Sign up to get started with TeamHub
           </p>
         </div>
 
-        {/* Google login */}
+        {/* Google sign up */}
         <button
           onClick={() => {
             window.location.href =
@@ -71,8 +86,24 @@ export default function Login() {
           <div className="h-px flex-1 bg-[#e6ebf5]" />
         </div>
 
-        {/* Email / password (placeholder) */}
+        {/* Name / Email / Password */}
         <form onSubmit={handleFormSubmit} className="space-y-4">
+          <div>
+            <label className="mb-1 block text-sm font-medium text-[#0b1220]">
+              Full name
+            </label>
+            <input
+              type="text"
+              placeholder="Jane Smith"
+              value={name}
+              onChange={(e) => {
+                setName(e.target.value);
+                clearError();
+              }}
+              className="w-full rounded-lg border border-[#e6ebf5] px-3 py-2 text-sm text-[#0b1220] placeholder:text-[#8a97b3] focus:border-[#4f7cff] focus:outline-none focus:ring-2 focus:ring-[#4f7cff]/30"
+            />
+          </div>
+
           <div>
             <label className="mb-1 block text-sm font-medium text-[#0b1220]">
               Email address
@@ -83,7 +114,7 @@ export default function Login() {
               value={email}
               onChange={(e) => {
                 setEmail(e.target.value);
-                setError("");
+                clearError();
               }}
               className="w-full rounded-lg border border-[#e6ebf5] px-3 py-2 text-sm text-[#0b1220] placeholder:text-[#8a97b3] focus:border-[#4f7cff] focus:outline-none focus:ring-2 focus:ring-[#4f7cff]/30"
             />
@@ -99,46 +130,53 @@ export default function Login() {
               value={password}
               onChange={(e) => {
                 setPassword(e.target.value);
-                setError("");
+                clearError();
               }}
               className="w-full rounded-lg border border-[#e6ebf5] px-3 py-2 text-sm text-[#0b1220] placeholder:text-[#8a97b3] focus:border-[#4f7cff] focus:outline-none focus:ring-2 focus:ring-[#4f7cff]/30"
             />
           </div>
 
           <Button
-            disabled={email === "" || password === ""}
+            disabled={name === "" || email === "" || password === ""}
+            type="submit"
             className="w-full"
             style={{
               backgroundColor: "#155DFC",
               cursor: "pointer",
             }}
-            onClick={handleSignin}
           >
-            Sign in
+            Create account
           </Button>
 
           {error.length > 0 && (
             <Alert variant="destructive" className="max-w-md">
               <AlertCircleIcon />
               <AlertTitle>Error</AlertTitle>
-              <AlertDescription className="break-words whitespace-normal">
+              <AlertDescription>
                 {error}
+                {errorDetails.length > 0 && (
+                  <ul className="mt-2 list-disc pl-5 text-sm">
+                    {errorDetails.map((detail, index) => (
+                      <li key={index}>{detail}</li>
+                    ))}
+                  </ul>
+                )}
               </AlertDescription>
             </Alert>
           )}
 
-          <div className="mt-6 text-center text-sm text-[#5b6b8a]">
-            Don't have an account ?
+          {/* Footer */}
+          <div className="text-center text-sm text-[#5b6b8a]">
+            Already have an account?{" "}
             <Button
               variant="link"
               style={{ color: "#155DFC", cursor: "pointer" }}
-              onClick={() => navigate("/signup")}
+              onClick={() => navigate("/signin")}
             >
-              Sign up
+              Sign in
             </Button>
           </div>
         </form>
-
       </div>
     </div>
   );

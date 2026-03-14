@@ -219,7 +219,7 @@ export function SimpleEditor({
   const toolbarRef = useRef<HTMLDivElement>(null);
 
   const [ydoc] = useState(() => new Y.Doc());
-  const [provider] = useState(
+  const [provider, setProvider] = useState(
     () =>
       new HocuspocusProvider({
         name: documentId,
@@ -232,14 +232,14 @@ export function SimpleEditor({
   useEffect(() => {
     if (provider && currentUser) {
       // Set the awareness field for the current user
-      provider.setAwarenessField("user", {
+      provider?.setAwarenessField("user", {
         id: +currentUser?.id,
         name: currentUser?.name,
         color: currentUser?.color,
       });
 
       // Listen for updates to the states of all users
-      provider.on(
+      provider?.on(
         "awarenessChange",
         ({ states }: { states: AwarenessState[] }) => {
           const collaborators = Array.from(
@@ -331,6 +331,27 @@ export function SimpleEditor({
       setMobileView("main");
     }
   }, [isMobile, mobileView]);
+
+  useEffect(() => {
+    if (!provider) {
+      setProvider(
+        new HocuspocusProvider({
+          name: documentId,
+          url: import.meta.env.VITE_COLLAB_WS_BASE_URL,
+          document: ydoc,
+          token: collabToken,
+        }),
+      );
+    }
+
+    return () => {
+      if (provider) {
+        provider.destroy();
+        provider.disconnect();
+        setProvider(null);
+      }
+    };
+  }, [documentId, collabToken, ydoc, provider]);
 
   return (
     <div className="simple-editor-wrapper">
