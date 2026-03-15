@@ -4,6 +4,8 @@ import apiClient from "@/lib/axios";
 import { AlertCircleIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAppDispatch } from "../store/hooks";
+import { setUser } from "../store/userSlice";
 
 export default function SignUp() {
   const [name, setName] = useState("");
@@ -11,6 +13,7 @@ export default function SignUp() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [errorDetails, setErrorDetails] = useState([]);
+  const dispatch = useAppDispatch();
 
   const navigate = useNavigate();
 
@@ -23,6 +26,7 @@ export default function SignUp() {
     apiClient
       .post("/auth/signup", { name, email, password })
       .then((response) => {
+        dispatch(setUser(response.data));
         navigate("/");
       })
       .catch((err) => {

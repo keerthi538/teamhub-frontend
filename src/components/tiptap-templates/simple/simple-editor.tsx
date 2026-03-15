@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useRef, useState } from "react";
 import { EditorContent, EditorContext, useEditor } from "@tiptap/react";
 
@@ -36,10 +34,8 @@ import "@/components/tiptap-node/paragraph-node/paragraph-node.scss";
 
 // --- Tiptap UI ---
 import { HeadingDropdownMenu } from "@/components/tiptap-ui/heading-dropdown-menu";
-import { ImageUploadButton } from "@/components/tiptap-ui/image-upload-button";
 import { ListDropdownMenu } from "@/components/tiptap-ui/list-dropdown-menu";
 import { BlockquoteButton } from "@/components/tiptap-ui/blockquote-button";
-import { CodeBlockButton } from "@/components/tiptap-ui/code-block-button";
 import {
   ColorHighlightPopover,
   ColorHighlightPopoverContent,
@@ -64,14 +60,30 @@ import { useIsBreakpoint } from "@/hooks/use-is-breakpoint";
 import { useWindowSize } from "@/hooks/use-window-size";
 import { useCursorVisibility } from "@/hooks/use-cursor-visibility";
 
-// --- Components ---
-import { ThemeToggle } from "@/components/tiptap-templates/simple/theme-toggle";
-
 // --- Lib ---
 import { handleImageUpload, MAX_FILE_SIZE } from "@/lib/tiptap-utils";
 
 // --- Styles ---
 import "@/components/tiptap-templates/simple/simple-editor.scss";
+
+import Collaboration from "@tiptap/extension-collaboration";
+import * as Y from "yjs";
+import { HocuspocusProvider } from "@hocuspocus/provider";
+import CollaborationCaret from "@tiptap/extension-collaboration-caret";
+
+interface AwarenessState {
+  clientId: number;
+  user: {
+    id: number;
+    name: string;
+    color: string;
+    mouseX: number;
+    mouseY: number;
+  };
+  cursor: null;
+}
+
+// --- Toolbar Sub-components ---
 
 const MainToolbarContent = ({
   onHighlighterClick,
@@ -81,76 +93,60 @@ const MainToolbarContent = ({
   onHighlighterClick: () => void;
   onLinkClick: () => void;
   isMobile: boolean;
-}) => {
-  return (
-    <>
-      <Spacer />
+}) => (
+  <>
+    <Spacer />
 
-      <ToolbarGroup>
-        <UndoRedoButton action="undo" />
-        <UndoRedoButton action="redo" />
-      </ToolbarGroup>
+    <ToolbarGroup>
+      <UndoRedoButton action="undo" />
+      <UndoRedoButton action="redo" />
+    </ToolbarGroup>
 
-      <ToolbarSeparator />
+    <ToolbarSeparator />
 
-      <ToolbarGroup>
-        <HeadingDropdownMenu levels={[1, 2, 3, 4]} portal={isMobile} />
-        <ListDropdownMenu
-          types={["bulletList", "orderedList", "taskList"]}
-          portal={isMobile}
-        />
-        <BlockquoteButton />
-        {/* <CodeBlockButton /> */}
-      </ToolbarGroup>
+    <ToolbarGroup>
+      <HeadingDropdownMenu levels={[1, 2, 3, 4]} portal={isMobile} />
+      <ListDropdownMenu
+        types={["bulletList", "orderedList", "taskList"]}
+        portal={isMobile}
+      />
+      <BlockquoteButton />
+    </ToolbarGroup>
 
-      <ToolbarSeparator />
+    <ToolbarSeparator />
 
-      <ToolbarGroup>
-        <MarkButton type="bold" />
-        <MarkButton type="italic" />
-        <MarkButton type="strike" />
-        {/* <MarkButton type="code" /> */}
-        <MarkButton type="underline" />
-        {!isMobile ? (
-          <ColorHighlightPopover />
-        ) : (
-          <ColorHighlightPopoverButton onClick={onHighlighterClick} />
-        )}
-        {!isMobile ? <LinkPopover /> : <LinkButton onClick={onLinkClick} />}
-      </ToolbarGroup>
+    <ToolbarGroup>
+      <MarkButton type="bold" />
+      <MarkButton type="italic" />
+      <MarkButton type="strike" />
+      <MarkButton type="underline" />
+      {!isMobile ? (
+        <ColorHighlightPopover />
+      ) : (
+        <ColorHighlightPopoverButton onClick={onHighlighterClick} />
+      )}
+      {!isMobile ? <LinkPopover /> : <LinkButton onClick={onLinkClick} />}
+    </ToolbarGroup>
 
-      <ToolbarSeparator />
+    <ToolbarSeparator />
 
-      <ToolbarGroup>
-        <MarkButton type="superscript" />
-        <MarkButton type="subscript" />
-      </ToolbarGroup>
+    <ToolbarGroup>
+      <MarkButton type="superscript" />
+      <MarkButton type="subscript" />
+    </ToolbarGroup>
 
-      <ToolbarSeparator />
+    <ToolbarSeparator />
 
-      <ToolbarGroup>
-        <TextAlignButton align="left" />
-        <TextAlignButton align="center" />
-        <TextAlignButton align="right" />
-        <TextAlignButton align="justify" />
-      </ToolbarGroup>
+    <ToolbarGroup>
+      <TextAlignButton align="left" />
+      <TextAlignButton align="center" />
+      <TextAlignButton align="right" />
+      <TextAlignButton align="justify" />
+    </ToolbarGroup>
 
-      {/* <ToolbarSeparator /> */}
-
-      {/* <ToolbarGroup>
-        <ImageUploadButton text="Add" />
-      </ToolbarGroup> */}
-
-      <Spacer />
-
-      {isMobile && <ToolbarSeparator />}
-
-      {/* <ToolbarGroup>
-        <ThemeToggle />
-      </ToolbarGroup> */}
-    </>
-  );
-};
+    <Spacer />
+  </>
+);
 
 const MobileToolbarContent = ({
   type,
@@ -181,22 +177,7 @@ const MobileToolbarContent = ({
   </>
 );
 
-import Collaboration from "@tiptap/extension-collaboration";
-import * as Y from "yjs";
-import { HocuspocusProvider } from "@hocuspocus/provider";
-import CollaborationCaret from "@tiptap/extension-collaboration-caret";
-
-interface AwarenessState {
-  clientId: number;
-  user: {
-    id: number;
-    name: string;
-    color: string;
-    mouseX: number;
-    mouseY: number;
-  };
-  cursor: null;
-}
+// --- Main Component ---
 
 export function SimpleEditor({
   documentId,
@@ -208,7 +189,7 @@ export function SimpleEditor({
   collabToken: string;
   currentUser: { id: number; name: string; color: string };
   handleCollaboratorsChange: (
-    collaborators: Array<{ name: string; color: string }>,
+    collaborators: Array<{ id: number; name: string; color: string }>,
   ) => void;
 }) {
   const isMobile = useIsBreakpoint();
@@ -218,111 +199,166 @@ export function SimpleEditor({
   );
   const toolbarRef = useRef<HTMLDivElement>(null);
 
+  // ydoc lives for the lifetime of the component
   const [ydoc] = useState(() => new Y.Doc());
-  const [provider, setProvider] = useState(
-    () =>
-      new HocuspocusProvider({
-        name: documentId,
-        url: import.meta.env.VITE_COLLAB_WS_BASE_URL,
-        document: ydoc,
-        token: collabToken,
-      }),
-  );
+
+  // provider is created once per (documentId + collabToken) pair
+  const [provider, setProvider] = useState<HocuspocusProvider | null>(null);
+
+  // Stable ref so event listeners always see the latest values
+  // without needing to be re-registered on every render
+  const currentUserRef = useRef(currentUser);
+  const providerRef = useRef<HocuspocusProvider | null>(null);
+  const handleCollaboratorsChangeRef = useRef(handleCollaboratorsChange);
 
   useEffect(() => {
-    if (provider && currentUser) {
-      // Set the awareness field for the current user
-      provider?.setAwarenessField("user", {
-        id: +currentUser?.id,
-        name: currentUser?.name,
-        color: currentUser?.color,
-      });
+    currentUserRef.current = currentUser;
+  }, [currentUser]);
 
-      // Listen for updates to the states of all users
-      provider?.on(
-        "awarenessChange",
-        ({ states }: { states: AwarenessState[] }) => {
-          const collaborators = Array.from(
-            new Map(
-              states.map((state) => [
-                state.user.id,
-                {
-                  id: state.user.id,
-                  name: state.user.name,
-                  color: state.user.color,
-                },
-              ]),
-            ).values(),
-          );
+  useEffect(() => {
+    handleCollaboratorsChangeRef.current = handleCollaboratorsChange;
+  }, [handleCollaboratorsChange]);
 
-          handleCollaboratorsChange(collaborators);
-        },
+  // Create / recreate the provider whenever documentId or collabToken changes
+  useEffect(() => {
+    const newProvider = new HocuspocusProvider({
+      name: documentId,
+      url: import.meta.env.VITE_COLLAB_WS_BASE_URL,
+      document: ydoc,
+      token: collabToken,
+    });
+
+    providerRef.current = newProvider;
+    setProvider(newProvider);
+
+    return () => {
+      newProvider.off("awarenessChange");
+      newProvider.destroy();
+      newProvider.disconnect();
+      providerRef.current = null;
+    };
+    // ydoc is intentionally excluded: it is stable for the component lifetime
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [documentId, collabToken]);
+
+  // Destroy ydoc on unmount
+  useEffect(() => {
+    return () => {
+      ydoc.destroy();
+    };
+  }, [ydoc]);
+
+  // Register awareness listener and mouse-move tracker
+  useEffect(() => {
+    if (!provider) return;
+
+    const onAwarenessChange = ({ states }: { states: AwarenessState[] }) => {
+      const collaborators = Array.from(
+        new Map(
+          states.map((state) => [
+            state.user.id,
+            {
+              id: state.user.id,
+              name: state.user.name,
+              color: state.user.color,
+            },
+          ]),
+        ).values(),
       );
+      // Always uses the latest callback via ref — no stale closure
+      handleCollaboratorsChangeRef.current(collaborators);
+    };
 
-      document.addEventListener("mousemove", (event) => {
-        // Share any information you like
-        provider.setAwarenessField("user", {
-          id: +currentUser?.id,
-          name: currentUser?.name,
-          color: currentUser?.color,
-          mouseX: event.clientX,
-          mouseY: event.clientY,
-        });
+    provider.on("awarenessChange", onAwarenessChange);
+
+    const onMouseMove = (event: MouseEvent) => {
+      // Always uses the latest user via ref — no stale closure
+      const user = currentUserRef.current;
+      if (!user) return;
+      providerRef.current?.setAwarenessField("user", {
+        id: +user.id,
+        name: user.name,
+        color: user.color,
+        mouseX: event.clientX,
+        mouseY: event.clientY,
       });
-    }
-  }, [provider, currentUser]);
+    };
 
-  const editor = useEditor({
-    immediatelyRender: false,
-    editorProps: {
-      attributes: {
-        autocomplete: "off",
-        autocorrect: "off",
-        autocapitalize: "off",
-        "aria-label": "Main content area, start typing to enter text.",
-        class: "simple-editor",
+    document.addEventListener("mousemove", onMouseMove);
+
+    return () => {
+      provider.off("awarenessChange", onAwarenessChange);
+      document.removeEventListener("mousemove", onMouseMove);
+    };
+  }, [provider]);
+
+  // Track whether the editor view is fully mounted.
+  // useEditor returns an instance before the ProseMirror view exists, so we
+  // use onCreate/onDestroy to know when it is actually safe to access view APIs.
+  const [editorMounted, setEditorMounted] = useState(false);
+
+  const editor = useEditor(
+    {
+      immediatelyRender: false,
+      onCreate: () => setEditorMounted(true),
+      onDestroy: () => setEditorMounted(false),
+      editorProps: {
+        attributes: {
+          autocomplete: "off",
+          autocorrect: "off",
+          autocapitalize: "off",
+          "aria-label": "Main content area, start typing to enter text.",
+          class: "simple-editor",
+        },
       },
+      extensions: [
+        StarterKit.configure({
+          horizontalRule: false,
+          link: {
+            openOnClick: false,
+            enableClickSelection: true,
+          },
+        }),
+        Collaboration.configure({ document: ydoc }),
+        // provider may be null on first render; editor is re-created when
+        // provider changes (see dependency array below)
+        ...(provider
+          ? [
+              CollaborationCaret.configure({
+                provider,
+                user: {
+                  name: currentUser?.name,
+                  color: currentUser?.color,
+                },
+              }),
+            ]
+          : []),
+        HorizontalRule,
+        TextAlign.configure({ types: ["heading", "paragraph"] }),
+        TaskList,
+        TaskItem.configure({ nested: true }),
+        Highlight.configure({ multicolor: true }),
+        Image,
+        Typography,
+        Superscript,
+        Subscript,
+        Selection,
+        ImageUploadNode.configure({
+          accept: "image/*",
+          maxSize: MAX_FILE_SIZE,
+          limit: 3,
+          upload: handleImageUpload,
+          onError: (error) => console.error("Upload failed:", error),
+        }),
+      ],
     },
-    extensions: [
-      StarterKit.configure({
-        horizontalRule: false,
-        link: {
-          openOnClick: false,
-          enableClickSelection: true,
-        },
-      }),
-      Collaboration.configure({
-        document: ydoc,
-      }),
-      CollaborationCaret.configure({
-        provider,
-        user: {
-          name: currentUser?.name,
-          color: currentUser?.color,
-        },
-      }),
-      HorizontalRule,
-      TextAlign.configure({ types: ["heading", "paragraph"] }),
-      TaskList,
-      TaskItem.configure({ nested: true }),
-      Highlight.configure({ multicolor: true }),
-      Image,
-      Typography,
-      Superscript,
-      Subscript,
-      Selection,
-      ImageUploadNode.configure({
-        accept: "image/*",
-        maxSize: MAX_FILE_SIZE,
-        limit: 3,
-        upload: handleImageUpload,
-        onError: (error) => console.error("Upload failed:", error),
-      }),
-    ],
-  });
+    [provider],
+  );
 
+  // Only pass the editor to useCursorVisibility once onCreate has fired,
+  // guaranteeing editor.view exists and view.hasFocus() won't throw.
   const rect = useCursorVisibility({
-    editor,
+    editor: editorMounted ? editor : null,
     overlayHeight: toolbarRef.current?.getBoundingClientRect().height ?? 0,
   });
 
@@ -332,39 +368,23 @@ export function SimpleEditor({
     }
   }, [isMobile, mobileView]);
 
-  useEffect(() => {
-    if (!provider) {
-      setProvider(
-        new HocuspocusProvider({
-          name: documentId,
-          url: import.meta.env.VITE_COLLAB_WS_BASE_URL,
-          document: ydoc,
-          token: collabToken,
-        }),
-      );
-    }
-
-    return () => {
-      if (provider) {
-        provider.destroy();
-        provider.disconnect();
-        setProvider(null);
-      }
-    };
-  }, [documentId, collabToken, ydoc, provider]);
+  // Don't render until both provider and editor are ready.
+  // Rendering EditorContent before the editor view is mounted causes the
+  // "hasFocus" error because tiptap tries to access the view immediately.
+  if (!provider || !editor) {
+    return <div className="simple-editor-wrapper" />;
+  }
 
   return (
     <div className="simple-editor-wrapper">
       <EditorContext.Provider value={{ editor }}>
         <Toolbar
           ref={toolbarRef}
-          style={{
-            ...(isMobile
-              ? {
-                  bottom: `calc(100% - ${height - rect.y}px)`,
-                }
-              : {}),
-          }}
+          style={
+            isMobile
+              ? { bottom: `calc(100% - ${height - rect.y}px)` }
+              : undefined
+          }
         >
           {mobileView === "main" ? (
             <MainToolbarContent
