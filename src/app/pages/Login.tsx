@@ -4,11 +4,14 @@ import apiClient from "@/lib/axios";
 import { AlertCircleIcon } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router";
+import { useAppDispatch } from "../store/hooks";
+import { setUser } from "../store/userSlice";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const dispatch = useAppDispatch();
 
   const navigate = useNavigate();
 
@@ -16,6 +19,7 @@ export default function Login() {
     apiClient
       .post("/auth/signin", { email, password })
       .then((response) => {
+        dispatch(setUser(response.data));
         navigate("/");
       })
       .catch((error) => {
@@ -127,7 +131,7 @@ export default function Login() {
             </Alert>
           )}
 
-          <div className="mt-6 text-center text-sm text-[#5b6b8a]">
+          <div className="text-center text-sm text-[#5b6b8a]">
             Don't have an account ?
             <Button
               variant="link"
@@ -138,7 +142,6 @@ export default function Login() {
             </Button>
           </div>
         </form>
-
       </div>
     </div>
   );

@@ -44,7 +44,27 @@ const initialState: UserState = {
 export const userSlice = createSlice({
   name: "user",
   initialState,
-  reducers: {},
+  reducers: {
+    setUser(state, action) {
+      const {
+        id,
+        email,
+        name,
+        teams,
+        currentTeam,
+        profileColor,
+        currentTeamRole,
+      } = action.payload;
+      state.id = id;
+      state.email = email;
+      state.name = name;
+      state.teams = teams;
+      state.currentTeam = currentTeam;
+      state.isAuthenticated = true;
+      state.profileColor = profileColor || state.profileColor;
+      state.currentTeamRole = currentTeamRole || state.currentTeamRole; // Update currentTeamRole if provided
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchMe.pending, (state) => {
@@ -69,5 +89,6 @@ export const userSlice = createSlice({
 });
 
 export const selectUser = (state: RootState) => state.user;
+export const { setUser } = userSlice.actions;
 
 export default userSlice.reducer;
