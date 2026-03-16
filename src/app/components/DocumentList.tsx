@@ -133,7 +133,7 @@ const DocumentList = ({
     <>
       {documents.length > 0 ? (
         <div className="flex-1 overflow-auto px-8 py-6">
-          <div className="flex items-center justify-between mb-4">
+          {/* <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -150,7 +150,7 @@ const DocumentList = ({
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
-          </div>
+          </div> */}
 
           <Table>
             <TableHeader>

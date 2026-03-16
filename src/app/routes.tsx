@@ -5,6 +5,7 @@ import AppLayout from "./common/AppLayout";
 import TeamMembers from "./pages/TeamMembers";
 import EditorPage from "./pages/EditorPage";
 import SignUp from "./pages/Signup";
+import NotFoundPage from "./pages/NotFound";
 
 export const routes = [
   {
@@ -35,6 +36,14 @@ export const routes = [
         path: "teams/:teamId/documents/:documentId",
         element: <EditorPage />,
       },
+      {
+        path: "*",
+        element: <NotFoundPage />,
+      },
     ],
+  },
+  {
+    path: "*",
+    element: <NotFoundPage />,
   },
 ];

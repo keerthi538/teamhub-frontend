@@ -59,7 +59,7 @@ const SidebarNavItem: React.FC<SidebarNavItemProps> = ({
 }) => (
   <button
     onClick={onClick}
-    className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors ${
+    className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors cursor-pointer ${
       active ? "bg-blue-50 text-blue-600" : "text-gray-600 hover:bg-gray-100"
     }`}
   >
@@ -156,10 +156,12 @@ const Sidebar = () => {
       <div className="p-4 border-b border-gray-200">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="w-full flex items-center gap-3 hover:bg-gray-50 p-2 rounded-lg transition-colors">
-              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-lg">
-                {user?.currentTeam?.name.charAt(0).toUpperCase() ?? "T"}
-              </div>
+            <button className="w-full flex items-center gap-3 hover:bg-gray-50 p-2 rounded-lg transition-colors cursor-pointer">
+              <img
+                src="/teamhub-logo.png"
+                alt="Company Logo"
+                className="w-10 h-10 rounded-lg object-cover"
+              />
               <div className="flex-1 text-left">
                 <div className="text-xs text-gray-500">CURRENT TEAM</div>
                 <div className="font-semibold text-gray-900">
@@ -170,10 +172,16 @@ const Sidebar = () => {
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-56">
-            <DropdownMenuItem onClick={() => setTeamSwitcherOpen(true)}>
+            <DropdownMenuItem
+              onClick={() => setTeamSwitcherOpen(true)}
+              className="cursor-pointer"
+            >
               Switch Team
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setTeamCreateModalOpen(true)}>
+            <DropdownMenuItem
+              onClick={() => setTeamCreateModalOpen(true)}
+              className="cursor-pointer"
+            >
               Create New Team
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -224,7 +232,7 @@ const Sidebar = () => {
       <div className="p-4 border-t border-gray-200">
         <DropdownMenu open={userMenuOpen} onOpenChange={setUserMenuOpen}>
           <DropdownMenuTrigger asChild>
-            <button className="w-full flex items-center gap-3 hover:bg-gray-50 p-2 rounded-lg transition-colors">
+            <button className="w-full flex items-center gap-3 hover:bg-gray-50 p-2 rounded-lg transition-colors ">
               {/* profile icon */}
               <Avatar
                 className="w-8 h-8 border-2 border-white ring-2 ring-slate-100 transition-transform hover:scale-110 hover:z-10"
@@ -238,7 +246,7 @@ const Sidebar = () => {
                 </AvatarFallback>
               </Avatar>
 
-              <div className="flex-1 text-left">
+              <div className="flex-1 text-left cursor-pointer">
                 <div className="font-medium text-gray-900 text-sm">
                   {user?.name}
                 </div>

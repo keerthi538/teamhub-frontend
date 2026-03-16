@@ -102,7 +102,7 @@ export default function Dashboard() {
             </Button>
             <Button
               onClick={handleCreateDocument}
-              className="bg-blue-600 hover:bg-blue-700"
+              className="bg-blue-600 hover:bg-blue-700 cursor-pointer"
               disabled={!currentTeam?.id}
             >
               + New Document
@@ -118,7 +118,7 @@ export default function Dashboard() {
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`py-4 px-2 font-medium text-sm border-b-2 transition-colors ${
+              className={`py-4 px-2 font-medium text-sm border-b-2 transition-colors cursor-pointer ${
                 activeTab === tab
                   ? "border-blue-600 text-blue-600"
                   : "border-transparent text-gray-600 hover:text-gray-900"
