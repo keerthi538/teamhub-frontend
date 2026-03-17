@@ -8,6 +8,7 @@ import { debounce, getNameInitials } from "@/lib/utils";
 import { useAppSelector } from "../store/hooks";
 import { selectUser } from "../store/userSlice";
 import apiClient from "@/lib/axios";
+import { USER_ROLES } from "@/constants";
 
 const MAX_COLLABORATORS_DISPLAYED = 4;
 
@@ -27,6 +28,9 @@ const EditorPage = () => {
   const [isDocPublished, setIsDocPublished] = useState(false);
   const titleInputRef = useRef<HTMLInputElement>(null);
   const user = useAppSelector(selectUser);
+  const canEditPage =
+    user.currentTeamRole === USER_ROLES.ADMIN ||
+    user.currentTeamRole === USER_ROLES.MEMBER;
 
   const characterCount = 250;
   const wordCount = 70;
@@ -232,6 +236,7 @@ const EditorPage = () => {
       </header>
 
       <SimpleEditor
+        isEditable={canEditPage}
         documentId={documentId!}
         collabToken={collabToken}
         currentUser={currentUser}

@@ -184,6 +184,7 @@ export function SimpleEditor({
   collabToken,
   currentUser,
   handleCollaboratorsChange,
+  isEditable,
 }: {
   documentId: string;
   collabToken: string;
@@ -191,6 +192,7 @@ export function SimpleEditor({
   handleCollaboratorsChange: (
     collaborators: Array<{ id: number; name: string; color: string }>,
   ) => void;
+  isEditable: boolean;
 }) {
   const isMobile = useIsBreakpoint();
   const { height } = useWindowSize();
@@ -299,6 +301,7 @@ export function SimpleEditor({
 
   const editor = useEditor(
     {
+      editable: isEditable,
       immediatelyRender: false,
       onCreate: () => setEditorMounted(true),
       onDestroy: () => setEditorMounted(false),
@@ -378,27 +381,29 @@ export function SimpleEditor({
   return (
     <div className="simple-editor-wrapper">
       <EditorContext.Provider value={{ editor }}>
-        <Toolbar
-          ref={toolbarRef}
-          style={
-            isMobile
-              ? { bottom: `calc(100% - ${height - rect.y}px)` }
-              : undefined
-          }
-        >
-          {mobileView === "main" ? (
-            <MainToolbarContent
-              onHighlighterClick={() => setMobileView("highlighter")}
-              onLinkClick={() => setMobileView("link")}
-              isMobile={isMobile}
-            />
-          ) : (
-            <MobileToolbarContent
-              type={mobileView === "highlighter" ? "highlighter" : "link"}
-              onBack={() => setMobileView("main")}
-            />
-          )}
-        </Toolbar>
+        {editor.isEditable && (
+          <Toolbar
+            ref={toolbarRef}
+            style={
+              isMobile
+                ? { bottom: `calc(100% - ${height - rect.y}px)` }
+                : undefined
+            }
+          >
+            {mobileView === "main" ? (
+              <MainToolbarContent
+                onHighlighterClick={() => setMobileView("highlighter")}
+                onLinkClick={() => setMobileView("link")}
+                isMobile={isMobile}
+              />
+            ) : (
+              <MobileToolbarContent
+                type={mobileView === "highlighter" ? "highlighter" : "link"}
+                onBack={() => setMobileView("main")}
+              />
+            )}
+          </Toolbar>
+        )}
 
         <EditorContent
           editor={editor}

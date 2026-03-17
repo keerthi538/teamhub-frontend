@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import { Team } from "../types";
 import { Button } from "@/components/ui/button";
 import CreateTeamModal from "./CreateTeamModal";
-import { useAppDispatch } from "../store/hooks";
-import { createTeam } from "../store/userSlice";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { createTeam, selectUser } from "../store/userSlice";
+import { USER_ROLES } from "@/constants";
 
 interface EmptyDocumentListProps {
   currentTeam: Team | null;
@@ -16,6 +17,10 @@ const EmptyDocumentList = ({
 }: EmptyDocumentListProps) => {
   const dispatch = useAppDispatch();
   const [teamCreateModalOpen, setTeamCreateModalOpen] = useState(false);
+  const currentUser = useAppSelector(selectUser);
+  const canCreateDocument =
+    currentUser.currentTeamRole === USER_ROLES.ADMIN ||
+    currentUser.currentTeamRole === USER_ROLES.MEMBER;
 
   const handleCreateTeam = (teamName: string) => {
     dispatch(createTeam(teamName));
@@ -47,15 +52,21 @@ const EmptyDocumentList = ({
     return (
       <div className="flex flex-col items-center justify-center h-full text-center">
         <h2 className="text-xl font-semibold mb-4">No Documents Yet</h2>
-        <p className="text-gray-500 mb-6">
-          Start by creating your first document.
-        </p>
-        <Button
-          onClick={handleCreateDocument}
-          className="bg-blue-600 hover:bg-blue-700"
-        >
-          + New Document
-        </Button>
+
+        {canCreateDocument && (
+          <>
+            <p className="text-gray-500 mb-6">
+              Start by creating your first document.
+            </p>
+
+            <Button
+              onClick={handleCreateDocument}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              + New Document
+            </Button>
+          </>
+        )}
       </div>
     );
   }

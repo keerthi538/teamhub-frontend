@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 import apiClient from "@/lib/axios";
+import { USER_ROLES } from "@/constants";
 
 // Type Definitions
 type DocumentStatus = "PUBLISHED" | "DRAFT" | "INTERNAL";
@@ -33,7 +34,11 @@ export default function Dashboard() {
   const user = useAppSelector((state) => state.user);
   const { currentTeam } = user;
   const navigate = useNavigate();
-  const tabs = ["All Docs", "Drafts", "Published"];
+  const tabs = ["All Docs"];
+
+  if (user.currentTeamRole !== USER_ROLES.VIEWER) {
+    tabs.push("Drafts", "Published");
+  }
 
   const [documents, setDocuments] = useState<Document[]>([]);
   const [activeTab, setActiveTab] = useState<string>("All Docs");
@@ -103,7 +108,9 @@ export default function Dashboard() {
             <Button
               onClick={handleCreateDocument}
               className="bg-blue-600 hover:bg-blue-700 cursor-pointer"
-              disabled={!currentTeam?.id}
+              disabled={
+                !currentTeam?.id || user.currentTeamRole === USER_ROLES.VIEWER
+              }
             >
               + New Document
             </Button>
